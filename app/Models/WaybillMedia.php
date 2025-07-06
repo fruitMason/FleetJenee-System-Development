@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+
+class WaybillMedia extends Model
+{
+    use HasFactory, SoftDeletes;
+    protected $guarded = ['id'];
+
+    protected $table = 'waybill_media';
+
+    public function accidentReport(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Waybill::class, 'waybill_id');
+    }
+}

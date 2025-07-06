@@ -1,0 +1,88 @@
+<div id="add_waybill_modal" class="modal custom-modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Waybill</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal_body">
+                <form method="post" id="form_create" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label class="col-form-label">Driver <span class="text-danger">*</span></label>
+                                        <select class="form-control create_select_search" name="user_id" required>
+                                            <option value="0">-- select user/driver --</option>
+                                            @foreach($drivers as $driver)
+                                                <option value="{{$driver->id}}">{{$driver->full_name()}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+{{--                                    <div class="col-md-6">--}}
+{{--                                        <label class="col-form-label">Car <span class="text-danger">*</span></label>--}}
+{{--                                        <select class="form-control create_select_search" name="car_id" required>--}}
+{{--                                            <option value="0">-- select car --</option>--}}
+{{--                                            @foreach($cars as $car)--}}
+{{--                                                <option value="{{$car->id}}">{{$car->model}} ({{$car->car_number}})</option>--}}
+{{--                                            @endforeach--}}
+{{--                                        </select>--}}
+{{--                                    </div>--}}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label class="col-form-label">Destination <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" name="destination" rows="7"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="col-form-label">Item Name/Description <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" name="item" rows="7"></textarea>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="col-form-label">No. of Packages </label>
+                                        <input type="number" name="no_of_packages" min="0" class="form-control">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="col-form-label">Weight </label>
+                                        <input type="text" name="weight" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label class="col-form-label">Media (Audio, Videos, Images) </label>
+                                        <div class="image-upload-wrap">
+                                            <input class="form-control-file" id="file" name="file" type='file' accept="image/*, audio/*, video/*, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="submit-section">
+                                    <button class="btn btn-primary submit-btn">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
