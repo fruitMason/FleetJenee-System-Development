@@ -104,7 +104,7 @@
                     <li class="@if (str_contains(url()->current(), '/odometer/overdue')) active @endif">
                         <a href="{{ route('fleet.vehicle.odometer.overdue') }}"><i class="fa fa-tachometer"></i>
                             Overdue Odometers <span
-                                        class="badge rounded-pill bg-primary float-end">{{ $odo_overdue }}</span></a>
+                                        class="badge rounded-pill bg-primary float-end">{{ $odo_overdue  }}</span></a>
                     </li>
                 @endcan
                 @can('Driver License')

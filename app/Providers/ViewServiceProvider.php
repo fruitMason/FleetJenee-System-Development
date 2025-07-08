@@ -45,6 +45,7 @@ class ViewServiceProvider extends ServiceProvider
             $notifications = auth()->user()->can('fleet_management') ? Notification::query()->orderByDesc('created_at')->limit(10)->get() : Notification::query()->where('to_user_id', auth()->id())->orderByDesc('created_at')->limit(10)->get();
             $total_taxes = Tax::query()->count();
             $invoices = Invoice::query()->where('status', '=', 'pending')->count();
+            $odo_overdue = Car::where('odometer_status','Active')->count();
 
             $view->with([
                 'total_sectors' => $total_sectors,
@@ -57,7 +58,8 @@ class ViewServiceProvider extends ServiceProvider
                 'total_vendors' => $total_vendors,
                 'notifications' => $notifications,
                 'total_taxes' => $total_taxes,
-                'invoices' => $invoices
+                'invoices' => $invoices,
+                'odo_overdue' => $odo_overdue,
             ]);
         });
     }
