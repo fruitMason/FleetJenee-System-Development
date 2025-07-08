@@ -57,12 +57,19 @@ class DriverManagerController extends Controller
             Notifications::createNotification(
                 $request->user_id,  // Notifying the specific user (driver)
                 'Car Maintenance Status Updated',
-                'The car with number ' . $car->car_number . ' has exceeded ' . number_format($odometerLevel) . ' km. Please schedule maintenance.'
+                'The car with number ' . $car->car_number . ' has exceeded ' . number_format($odometerLevel) . ' km. Current value is ' . number_format($create->new_value) . 'km. Please schedule maintenance.'
             );
 
-            $car->update(['odometer_status' => 'Overdue']);
+            Notifications::createNotification(
+                '1',  // Notifiy also fleet manager
+                'Car Maintenance Status Updated',
+                'The car with number ' . $car->car_number . ' has exceeded ' . number_format($odometerLevel) . ' km. Current value is ' . number_format($create->new_value) . 'km. Please schedule maintenance.'
+            );
 
-            $message = 'The car with number ' . $car->car_number . ' has exceeded ' . number_format($odometerLevel)  . ' km. Please schedule maintenance.';
+
+
+
+            $message = 'The car with number ' . $car->car_number . ' has exceeded ' . number_format($odometerLevel)  . ' km. Current value is '.number_format($create->new_value) .' km. Please schedule maintenance.';
             $naloMes = str_replace(' ', '+', $message);
             $mobile = User::find(1)->mobile;
 
@@ -75,6 +82,7 @@ class DriverManagerController extends Controller
                     Log::error('sms-error' . $e->getMessage());
                 }
             }
+            $car->update(['odometer_status' => 'Overdue']);
         }
         return back()->with('success', 'Odometer was ADDED successfully!');
     }

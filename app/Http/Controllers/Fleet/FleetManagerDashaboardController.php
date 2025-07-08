@@ -24,6 +24,7 @@ class FleetManagerDashaboardController extends Controller
         $pending_car_maintenances = \App\Models\CarMaintenance::isPending()->count();
         $ongoing_car_maintenances = \App\Models\CarMaintenance::isOngoing()->count();
         $completed_car_maintenances = \App\Models\CarMaintenance::isCompleted()->count();
+        $odo_overdue = Car::where('odometer_status','Active')->count();
 
         $total_vendors = \App\Models\Vendor::count();
 
@@ -66,7 +67,8 @@ class FleetManagerDashaboardController extends Controller
             'active_car_insurance' => $active_car_insurance,
             'expired_car_insurance' => $expired_car_insurance,
             'total_vendors_paid' => $total_vendors_paid,
-            'total_vendors_owed' => $total_vendors_owed
+            'total_vendors_owed' => $total_vendors_owed,
+            'odo_overdue' => $odo_overdue,
         ]);
     }
 }

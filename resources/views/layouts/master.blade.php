@@ -11,7 +11,7 @@
     <meta name="author" content="Dreamguys - Bootstrap Admin Template">
     <meta name="robots" content="noindex, nofollow">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('page_title') - autoSpa</title>
+    <title>@yield('page_title') - FleetJenee</title>
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/img/favicon.png') }}">
 
@@ -83,7 +83,7 @@
             </a>
 
             <div class="page-title-box">
-                <h3>autoSpa</h3>
+                <h3>FleetJenee</h3>
             </div>
 
             <a id="mobile_btn" class="mobile_btn" href="admin-dashboard.html#sidebar"><i class="fa fa-bars"></i></a>

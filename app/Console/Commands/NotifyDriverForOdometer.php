@@ -46,7 +46,7 @@ class NotifyDriverForOdometer extends Command
             if ($user) {
 
                 $message = "Odometer data for you car  " . $car_info . " has not been submited in more than 3days. Please submit odometer data"; // Customize your message
-                //$this->SendSMS_ViaHubtelAPI($user->mobile, $message);
+                $this->SendSMS_ViaHubtelAPI($user->mobile, $message);
                 Log::info('command run ' . now().' - - '.$user->mobile);
                 $this->info("SMS sent to {$user->mobile}");
             } else {

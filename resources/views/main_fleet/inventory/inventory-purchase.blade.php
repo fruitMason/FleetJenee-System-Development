@@ -70,7 +70,7 @@
                                             <label for="descriptiont" class="d-block mb-2">
                                                 Unit Price <span class="text-danger">*</span>
                                             </label>
-                                            <input type="text" id="unit_price" name="unit_price" readonly
+                                            <input type="text" id="unit_price" name="unit_price" 
                                                 class="form-control">
 
                                         </div>
@@ -78,7 +78,7 @@
                                 </div>
 
                                 <!-- Input 3 -->
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-group">
 
                                         <label for="descriptiont" class="d-block mb-2">
@@ -122,7 +122,7 @@
                                 onsubmit="return SubmitDelete(this,'Submit Auto Part Stock In Request');">
                                 @csrf
                                 <div class="overflow-x-auto">
-                                    <table class="table table-striped table-bordered">
+                                    <table class="table table-bordered table-sm">
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th scope="col">Auto Part</th>
@@ -257,25 +257,25 @@
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td class="px-4 py-4 whitespace-nowrap">
+                        <td class="">
                             ${item.name}
                             <input type="hidden" name="items[${index}][auto_part_id]" value="${item.auto_part_id}">
                             <input type="hidden" name="items[${index}][name]" value="${item.name}">
                         </td>
-                        <td class="px-4 py-4 whitespace-nowrap">
+                        <td class="">
                             ¢${item.unit_price.toFixed(2)}
                             <input type="hidden" name="items[${index}][unit_price]" value="${item.unit_price}">
                         </td>
-                        <td class="px-4 py-4 whitespace-nowrap">
+                        <td class="">
                             ${item.quantity}
                             <input type="hidden" name="items[${index}][quantity]" value="${item.quantity}">
                         </td>
-                        <td class="px-4 py-4 whitespace-nowrap">
+                        <td class="">
                             ¢${item.total.toFixed(2)}
                             <input type="hidden" name="items[${index}][total]" value="${item.total}">
                         </td>
-                        <td class="px-4 py-4 whitespace-nowrap">
-                            <button type="button" class="text-red-600 hover:text-red-900" onclick="removeItem(${index})">Remove</button>
+                        <td class="">
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeItem(${index})">Remove</button>
                         </td>
                     `;
                     itemsList.appendChild(row);

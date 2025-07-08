@@ -21,7 +21,7 @@ class OdometerSettingController extends Controller
     {
         $user = $request->user()->id;
         $up =  $request->validate([
-            'value' => 'required|numeric|min:10000',
+            'value' => 'required|numeric|min:1',
         ]);
         $up['updated_by'] = $user;
 
