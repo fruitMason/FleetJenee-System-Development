@@ -39,7 +39,8 @@ class CarRequest extends Model
 
     public function car(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Car::class, 'user_id', 'user_id'); // Adjust the keys as per your schema
+        //return $this->belongsTo(Car::class, 'user_id', 'user_id'); // Adjust the keys as per your schema
+        return $this->belongsTo(Car::class, 'car_id'); // Adjust the keys as per your schema
     }
     protected $casts = [
         'date_needed' => 'datetime',

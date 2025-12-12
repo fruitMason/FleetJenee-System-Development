@@ -8,7 +8,7 @@
     <meta name="keywords" content="admin, estimates, bootstrap, business, corporate, creative, management, minimal, modern, accounts, invoice, html5, responsive, CRM, Projects">
     <meta name="author" content="Dreamguys - Bootstrap Admin Template">
     <meta name="robots" content="noindex, nofollow">
-    <title>Login - autoSpa</title>
+    <title>Login - FleetJenee</title>
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/img/favicon.png') }}">
 
@@ -36,16 +36,16 @@
 
             <div class="account-logo">
                 @if(request()->getHost() == "fleetjenee.net")
-                   <img style="width: 250px;"  src="{{ asset('assets/img/fleetjeneelogo.jpg') }}" alt="autoSpa GH">
+                   <img style="width: 250px;"  src="{{ asset('assets/img/fleetjeneelogo.jpg') }}" alt="FleetJenee">
                 @else
-                    <img style="width: 250px;" src="{{ asset('assets/img/fleetjeneelogo.jpg') }}" alt="GOIL autoSpa">
+                    <img style="width: 250px;" src="{{ asset('assets/img/fleetjeneelogo.jpg') }}" alt="FleetJenee">
                 @endif
             </div>
 
             <div class="account-box">
                 <div class="account-wrapper">
                     <h3 class="account-title">Sign-In</h3>
-                    <p class="account-subtitle">Access the autoSpa panel using your email and password.</p>
+                    <p class="account-subtitle">Access the FleetJenee panel using your email and password.</p>
 
                     @include('includes.error')
 

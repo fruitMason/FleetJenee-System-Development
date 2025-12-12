@@ -47,6 +47,9 @@ class InvoiceDataTable extends DataTable
             ->editColumn('status', function ($row) {
                 return $this->formatStatus($row->status);
             })
+            ->editColumn('invoice_type', function ($row) {
+                return ucwords($row->invoice_type);
+            })
             ->editColumn('fin_status', function ($row) {
 
                 //'onclick="notifyAccountModal(' . $row->id . ',\'' .  $row->invoice_number . '\',\'' . $row->vendor->name . ' (Msg: ' . $row->message . ' )' . '\',\'' . number_format($row->net_total, 2) . '\')">'
@@ -97,14 +100,28 @@ class InvoiceDataTable extends DataTable
 
         if ($row->fin_status == null) {
 
-            return      '<div class="dropdown dropdown-action">' .
+            return
+                '<div class="dropdown dropdown-action">' .
                 '<a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>' .
                 '<div class="dropdown-menu dropdown-menu-right">' .
-                '<a class="dropdown-item" href="#"><i class="fa fa-pencil m-r-5"></i> Edit</a>' .
+                // '<a class="dropdown-item" href="#"><i class="fa fa-pencil m-r-5"></i> Edit</a>' .
                 '<a class="dropdown-item" href="' . route('finance.invoice.view', $row->id) . '"><i class="fa fa-eye m-r-5"></i> View</a>' .
-                '<a class="dropdown-item" href="#"><i class="fa fa-file-pdf-o m-r-5"></i> Download</a>' .
-                '<a class="dropdown-item" href="#"><i class="fa fa-trash-o m-r-5"></i> Delete</a>' .
-                '</div></div>';
+                // '<a class="dropdown-item" href="#"><i class="fa fa-file-pdf-o m-r-5"></i> Download</a>' .
+                // '<a class="dropdown-item" href="#"><i class="fa fa-trash-o m-r-5"></i> Delete</a>' .
+                '<a class="dropdown-item" href="#">' .
+                '<form method="post" action="' . route('finance.invoice.destroy', $row->id) . '"
+                                    onsubmit="return SubmitDelete(this,\'Delete Invoice [' . $row->invoice_type . ']\');" >' .
+                csrf_field() .
+                method_field('DELETE') .
+
+                '<button type="submit"  style="width:100%;color:black;align:right;" class="btn btn-danger" onclick="archiveNotify(' . $row->id . ')">
+                            <i class="fa fa-trash text-white" aria-hidden="true"> Delete</i>'.
+                            
+                '</button>' .
+                '</form></a>' .
+
+                '</div>
+                </div>';
         } else {
             if ($row->fin_status == 'pending') {
                 return      '<div class="dropdown dropdown-action">' .
@@ -112,8 +129,19 @@ class InvoiceDataTable extends DataTable
                     '<div class="dropdown-menu dropdown-menu-right">' .
                     '<a class="dropdown-item" href="#"><i class="fa fa-pencil m-r-5"></i> Edit</a>' .
                     '<a class="dropdown-item" href="' . route('finance.invoice.view', $row->id) . '"><i class="fa fa-eye m-r-5"></i> View</a>' .
-                    '<a class="dropdown-item" href="#"><i class="fa fa-file-pdf-o m-r-5"></i> Download</a>' .
+                    // '<a class="dropdown-item" href="#"><i class="fa fa-file-pdf-o m-r-5"></i> Download</a>' .
                     '<a class="dropdown-item" href="#"><i class="fa fa-trash-o m-r-5"></i> Delete</a>' .
+                    '<a class="dropdown-item" href="#"><i class="fa fa-trash-o m-r-5"></i> Delete' .
+                    '<form method="post" action="' . route('auto.parts.destroy', $row->id) . '"
+                                    onsubmit="return SubmitDelete(this,\'Delete Auto Part [' . $row->name . ']\');" >' .
+                    csrf_field() .
+                    method_field('DELETE') .
+
+                    '<button type="submit" class="btn btn-xs btn-danger" href="#" onclick="archiveNotify(' . $row->id . ')">
+                            <i class="fa fa-trash text-white" aria-hidden="true"></i>
+                            </button>' .
+                    '</form></a>' .
+
                     '</div></div>';
             }
         }
@@ -136,6 +164,9 @@ class InvoiceDataTable extends DataTable
 
         $status = $this->request()->get('status') != '-- Select Status --' && $this->request()->get('status') != null ? ['status' => $this->request()->get('status')] : [];
         Log::info($date);
+        Log::info($status);
+        $status =  $status == [] ? ['status' => 'pending'] : $status;
+        Log::info('status');
         Log::info($status);
         $query = Invoice::query()->with(['vendor', 'invoiceItem'])->whereBetween('created_at', $date)->where($status)->orderByDesc('created_at');
 
@@ -168,6 +199,7 @@ class InvoiceDataTable extends DataTable
             Column::make('status')->addClass('text-center no-border'),
             Column::make('vendor_id')->title('Vendor')->addClass('text-center no-border'),
             Column::make('created_date')->addClass('text-center no-border'),
+            Column::make('invoice_type')->addClass('text-center no-border'),
             Column::make('due_date')->addClass('text-center no-border'),
             Column::make('sub_total')->addClass('text-center no-border'),
             Column::make('tax_total')->title('Tax')->addClass('text-center no-border'),

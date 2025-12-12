@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Fleet;
 
 use App\DataTables\Fleet\FinanceRequestsDataTable;
+use App\Helpers\Notifications;
 use App\Http\Controllers\Controller;
 use App\Models\Car;
 use App\Models\Payment;
@@ -126,14 +127,7 @@ class FinanceRequestsController extends Controller
 
         $cars =  Car::select('id', 'model', 'car_number', 'car_group')->orderBy('model')->get();
 
-        // $users =  User::select(
-        //     'id',
-        //     'first_name',
-        //     'middle_name',
-        //     'last_name',
-        //     'type'
-        // )->where('type', '<>', 'MECHANIC')->orderBy('first_name')->get();
-
+        
         return view(
             'main_fleet.finance_requests.create-fin-request',
             [
@@ -167,6 +161,15 @@ class FinanceRequestsController extends Controller
         $pay_req['car_assigned'] = $user_ass;
 
         PaymentRequest::create($pay_req); //8f2xgG9A
+
+        $finance = User::role('FINANCE')->first();
+        if ($finance) {
+            Notifications::createNotification(
+                $finance->id,
+                'General Payment Request',
+                'New ' . ucwords($pay_req['payment_type']) . ' payment request for ¢' . number_format($pay_req['for_user_id'], 2) . ' successfully by ' . $request->user()->name
+            );
+        }
 
         return back()->with('success', ucwords($pay_req['payment_type']) . ' payment submitted successfully !',);
     }

@@ -570,7 +570,7 @@
 
 
             let LineChart_AllExpenses_Month_On_Month;
-            async function renderLineChartAmalgamationMonthOnMonth() {
+            async function renderExpenseDistribution() {
                 const transactions = @json($all_expenses_month_on_month);
                 const finance_data = document.getElementById("LineChart_AllExpenses_Month_On_Month");
 
@@ -589,6 +589,10 @@
                     },
                     'other': {
                         border: 'rgba(75, 192, 192, 1)',
+                        background: 'rgba(75, 192, 192, 0.2)'
+                    },
+                    'maintenance': {
+                        border: 'rgba(10, 192, 192, 1)',
                         background: 'rgba(75, 192, 192, 0.2)'
                     },
                     // Add more payment types with colors as needed
@@ -701,7 +705,7 @@
                 renderChartFinance();
                 renderChartFinanceDepartment();
                 renderChatMaintenaceLine();
-                renderLineChartAmalgamationMonthOnMonth();
+                renderExpenseDistribution();
                 renderChartVendor();
 
             });

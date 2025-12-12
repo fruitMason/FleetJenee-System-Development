@@ -113,7 +113,7 @@ class MechanicManagerController extends Controller
 
         // Notify fleet management about the status update
         Notifications::createNotification(
-            null,  // Assuming you are not notifying a specific user
+            '1',  // Assuming you are not notifying a specific user
             'Car Maintenance Status Updated',
             'The car maintenance status for car number ' . $garage->car->car_number . ' has been updated to ongoing.'
         );
@@ -208,7 +208,7 @@ class MechanicManagerController extends Controller
 
         // Notify fleet management about the status update
         Notifications::createNotification(
-            null,  // Assuming you are not notifying a specific user
+            '1',  // Assuming you are not notifying a specific user
             'Car Maintenance Status Updated',
             'The car maintenance status for car number ' . $garage->car->car_number . ' has been updated to diagnosed.'
         );
@@ -273,7 +273,7 @@ class MechanicManagerController extends Controller
 
         // Notify fleet management about the status update
         Notifications::createNotification(
-            null,  // Assuming you are not notifying a specific user
+            '1',  // Assuming you are not notifying a specific user
             'Car Maintenance Status Updated',
             'The car maintenance status for car number ' . $garage->car->car_number . ' has been updated to completed.'
         );

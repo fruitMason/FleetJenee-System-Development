@@ -133,6 +133,26 @@ class RequestController extends Controller
 
     public function approve(Request $request)
     {
+        //return $request;
+        $validator = Validator::make($request->all(), [
+            'approve_car_request_id' => 'required',
+            'approve_car_user_id' => 'required',
+            'car_id' => 'required',
+            'status' => 'required|string',
+            'comment' => 'nullable',
+            'user_id' => 'required'
+        ]);
+
+
+        if (CarRequest::where('user_id', $request->user_id)->where('trip_status', '!=', 'ended')->exists()) {
+            return Redirect::back()->withErrors(['error' => 'Selected user already has an unended trip!']);
+        }
+
+        if ($validator->fails()) {
+            return Redirect::back()->with(['errors' => $validator->errors()]);
+        }
+        $data = $validator->validated();
+
         // Find the car request by ID
         $carRequest = CarRequest::query()->find($request->approve_car_request_id);
 
@@ -141,7 +161,11 @@ class RequestController extends Controller
         }
 
         // Update the car request status to approved
-        $carRequest->status = 'approved';
+        $carRequest->status = $data['status'];
+        $carRequest->auth_by = $request->user()->id;
+        $carRequest->auth_comment = $data['comment'];
+        $carRequest->car_id = $data['car_id'];
+        $carRequest->user_id = $data['user_id'];
         $carRequest->save();
 
         // Fetch the requested car ensuring it's a pool car
@@ -156,7 +180,7 @@ class RequestController extends Controller
         }
 
         // Update the car's user ID
-        $car->update(['user_id' => $request->approve_car_user_id]);
+        $car->update(['user_id' => $request->user_id]);
 
         // Prepare the notification message
         $message = 'Congratulations, your car request has been approved and ' . $car->model . ' (' . $car->car_number . ') has been assigned to you. Thank you!';
@@ -164,9 +188,11 @@ class RequestController extends Controller
         $naloMessaage = str_replace(" ", "+", $message);
         // Send notifications
         Notifications::createNotification($carRequest->user_id, 'Car Request Approved', $message);
+        if ($carRequest->user_id != $request->user_id)
+            Notifications::createNotification($request->user_id, 'Car Request Approved', $message);
         try {
             GlobalValueCore::SendSMS_ViaHubtelAPI($mobile, $naloMessaage);
-        } catch (\Exception $e) { 
+        } catch (\Exception $e) {
             Log::error('sms-error' . $e->getMessage());
         }
 

@@ -103,14 +103,14 @@
                 @can('Overdue Odometers')
                     <li class="@if (str_contains(url()->current(), '/odometer/overdue')) active @endif">
                         <a href="{{ route('fleet.vehicle.odometer.overdue') }}"><i class="fa fa-tachometer"></i>
-                            Overdue Odometers <span
-                                        class="badge rounded-pill bg-primary float-end">{{ $odo_overdue  }}</span></a>
+                            <span>Overdue Odometers</span> <span
+                                class="badge rounded-pill bg-primary float-end">{{ $odo_overdue }}</span></a>
                     </li>
                 @endcan
                 @can('Driver License')
                     <li class="@if (str_contains(url()->current(), '/fleet/driver/license')) active @endif">
                         <a href="{{ route('fleet.vehicle.driver.license') }}"><i class="fa fa-drivers-license"></i>
-                            <span>Drivers - Drivers License</span></a>
+                            <span>Drivers License</span></a>
                     </li>
                 @endcan
 
@@ -175,16 +175,23 @@
                                     href="{{ route('inventory.index') }}">Parts Inventory</a>
                             </li>
                         @endcan
+
+                        {{-- @can(' Parts Purchase Request')
+                            <li> <a class="@if (str_contains(url()->current(), '/inventory/purchase')) active @endif"
+                                    href="{{ route('inventory.purchase.index') }}">Parts Purchase Request</a>
+                            </li>
+                        @endcan --}}
+
                         @can(' Parts Usage Request')
-                            <li> <a class="@if (str_contains(url()->current(), '/finance-parts/purchase')) active @endif"
-                                    href="{{ route('parts.purchase.order') }}">Parts Usage Request</a>
+                            <li> <a class="@if (str_contains(url()->current(), '/inventory/usage')) active @endif"
+                                    href="{{ route('inventory.usage.index') }}">Parts Usage Request</a>
                             </li>
                         @endcan
-                        @can(' Damaged Parts Processing')
+                        {{-- @can(' Damaged Parts Processing')
                             <li> <a class="@if (str_contains(url()->current(), '/finance-parts/purchase')) active @endif"
                                     href="{{ route('auto.parts.index') }}">Damaged Parts Processing</a>
                             </li>
-                        @endcan
+                        @endcan --}}
                         @can(' Auto Parts')
                             <li> <a class="@if (str_contains(url()->current(), '/auto-parts')) active @endif"
                                     href="{{ route('auto.parts.index') }}">Auto Parts</a>
@@ -332,13 +339,26 @@
                                 <span>Waybill</span></a>
                         </li>
                     @endif
+                    @can('Auto Part Requests')
+                        <li class="@if (str_contains(url()->current(), '/driver/auto-requests')) active @endif">
+                            <a href="{{ route('driver.auto.request') }}"><i class="fas fa-tools"></i>
+                                <span>Auto Part Requests</span></a>
+                        </li>
+                    @endcan
                 @endcan
-                @can('Car Requests')
-                    <li class="@if (str_contains(url()->current(), '/driver/car-requests')) active @endif">
-                        <a href="{{ route('driver.vehicle.request') }}"><i class="fa fa-car"></i> <span>Car
-                                Requests</span></a>
-                    </li>
-                @endcan
+                @php
+                    $drivertype = Auth::user()->driver_type;
+                @endphp
+                @if ($drivertype == 'DEPARTMENT_HEAD')
+                    @can('Car Requests')
+                        <li class="@if (str_contains(url()->current(), '/driver/car-requests')) active @endif">
+                            <a href="{{ route('driver.vehicle.request') }}"><i class="fa fa-car"></i> <span>Car
+                                    Requests</span></a>
+                        </li>
+                    @endcan
+                @endif
+
+
             </ul>
 
             {{-- MECHANIC MENUS --}}

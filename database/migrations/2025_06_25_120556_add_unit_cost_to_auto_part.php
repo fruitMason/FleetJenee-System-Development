@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('auto_parts', function (Blueprint $table) {
             $table->decimal('unit_cost')->default(1);
+            $table->decimal('balance')->default(0);
         });
     }
 

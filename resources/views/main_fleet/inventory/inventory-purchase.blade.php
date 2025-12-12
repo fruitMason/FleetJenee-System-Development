@@ -1,6 +1,8 @@
 @extends('layouts.master')
 
-@section('page_title', 'Finance Request')
+@section('page_title', 'Auto Part Purchase Order')
+
+
 
 @section('content')
     <div class="page-wrapper">
@@ -12,14 +14,14 @@
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h3 class="page-title">General Finance Requests</h3>
+                        <h3 class="page-title">Auto Part Purchase Requests</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"> <a href="{{ route('finance.requests.home') }}">Requests</a> </li>
                             <li class="breadcrumb-item active">Create General Request</li>
                         </ul>
                     </div>
                     <div class="col-auto float-end ms-auto">
-                        <a href="{{ route('finance.requests.home') }}" class="btn add-btn"><i class="fa fa-arrow-left"></i>
+                        <a href="{{ route('inventory.purchase.index') }}" class="btn add-btn"><i class="fa fa-arrow-left"></i>
                             Back
                             to List</a>
                     </div>
@@ -32,48 +34,42 @@
             <section class="panel panel-default">
                 <div class="card mg-b-20" id="card_content">
                     <div class="card-body">
-                        <div class="card-title">Request Detail </div>
+                        <div class="card-title">Select Auto Part </div>
                         <form id="orderForm">
                             @csrf
+
                             <div class="row">
                                 <!-- Input 1 -->
-                                <div class="col-md-4">
+                                <div class="col-sm-6 col-md-4">
                                     <div class="form-group">
-                                        <div class="col-md-12">
-                                            <div class="form-focus select-focus">
-                                                <label for="descriptiont" class="d-block mb-2">
-                                                    Auto Part <span class="text-danger">*</span>
-                                                </label>
 
-                                                <select id="auto_part_id" name="auto_part_id"
-                                                    class="select user-search2 form-control">
-                                                    <option value="">Select an auto part</option>
-                                                    @foreach ($autoParts as $part)
-                                                        <option value="{{ $part->id }}"
-                                                            data-price="{{ $part->unit_cost }}">
-                                                            {{ $part->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
+                                        {{-- <div class="form-focus select-focus"> --}}
+                                        <label for=" " class="">
+                                            Auto Part <span class="text-danger">*</span>
+                                        </label>
+
+                                        <select id="auto_part_id" name="auto_part_id"
+                                            class="select user-search2 form-control">
+                                            <option value="">Select an auto part</option>
+                                            @foreach ($autoParts as $part)
+                                                <option value="{{ $part->id }}" data-price="{{ $part->unit_cost }}">
+                                                    {{ $part->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        {{-- </div> --}}
+
                                     </div>
                                 </div>
 
 
-
-
-
                                 <!-- Input 2 -->
-                                <div class="col-md-2">
+                                <div class="col-sm-6 col-md-2">
                                     <div class="form-group">
-                                        <div class="form-group form-focus select-focus">
-                                            <label for="descriptiont" class="d-block mb-2">
-                                                Unit Price <span class="text-danger">*</span>
-                                            </label>
-                                            <input type="text" id="unit_price" name="unit_price" 
-                                                class="form-control">
-
-                                        </div>
+                                        <label for=" ">
+                                            Unit Price <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="number" id="unit_price" name="unit_price" step="0.01"
+                                            class="form-control">
                                     </div>
                                 </div>
 
@@ -81,7 +77,7 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
 
-                                        <label for="descriptiont" class="d-block mb-2">
+                                        <label for=" ">
                                             Quantity<span class="text-danger">*</span>
                                         </label>
                                         <input type="number" id="quantity" name="quantity" min="1" value="1"
@@ -90,10 +86,10 @@
                                 </div>
 
 
-                                <div class="col-md-2">
+                                <div class="col-sm-6  col-md-2">
                                     <div class="form-group">
                                         <label for="descriptiont" class="d-block mb-2">
-                                            -
+                                            &nbsp;
                                         </label>
                                         <button type="button" id="addItem" class="btn btn-primary">
                                             Add to List
@@ -118,11 +114,37 @@
                         <div class="bg-white rounded-lg p-6 mb-6">
 
 
-                            <form id="submitOrder" method="POST" action="{{ route('inventory.store') }}"
+                            <form id="submitOrder" method="POST" action="{{ route('inventory.purchase.store') }}"
                                 onsubmit="return SubmitDelete(this,'Submit Auto Part Stock In Request');">
                                 @csrf
                                 <div class="overflow-x-auto">
-                                    <table class="table table-bordered table-sm">
+                                    <div class="row">
+                                        <div class="col-sm-6  col-md-4">
+                                            <div class="form-group">
+                                                <label>Purchase Date <span class="text-danger">*</span></label>
+                                                <div class="cal-icon">
+                                                    <input id="purchase_date" name="purchase_date"
+                                                        class="form-control datetimepicker" type="text" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-md-2">
+                                            <div class="form-group">
+                                                <label>Reference <span class="text-danger">*</span></label>
+                                                <input type="text" id="reference" name="reference" class="form-control"
+                                                    required>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-md-6">
+                                            <div class="form-group">
+                                                <label>Message on Purchase (Remarks)</label>
+                                                <textarea id="message" name="message" class="form-control" rows="2">Purchase Order</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input id="totalValue" name="totalValue" type="hidden" required>
+
+                                    <table class="table table-bordered table-responsive">
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th scope="col">Auto Part</th>
@@ -177,14 +199,11 @@
     <script>
         $(document).ready(function() {
             console.log('document ready');
-            $('.user-search2').select2();
-            // $('.car-search2').select2();
+
+             $('.user-search2').select2();
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-
-
-
             const autoPartSelect = document.getElementById('auto_part_id');
             const unitPriceInput = document.getElementById('unit_price');
             const quantityInput = document.getElementById('quantity');
@@ -283,6 +302,8 @@
 
                 // Update grand total
                 grandTotalElement.textContent = `¢${grandTotal.toFixed(2)}`;
+                document.getElementById("totalValue").value = grandTotal;
+
 
                 // Enable/disable submit button
                 submitBtn.disabled = items.length === 0;

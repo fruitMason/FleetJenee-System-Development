@@ -41,7 +41,8 @@ class Notifications {
             'title' => $title,
             'body' => $message,
             'to_user_id' => $user,
-            'unread' => true
+            'unread' => true,
+            'user_id'=>Auth::user()->id
         ]);
     }
 

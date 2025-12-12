@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
+use Illuminate\Support\Facades\Gate;
 
 class MyCarRequestsDataTable extends DataTable
 {
@@ -24,11 +25,14 @@ class MyCarRequestsDataTable extends DataTable
                 return $row->created_at;
             })
             ->addColumn('checkbox', function ($row) {
-                return '<input type="checkbox" id="basic_checkbox_'.$row->id.'" class="filled-in">' .
-                    '<label for="basic_checkbox_'.$row->id.'" class="mb-0 h-15 ms-15"></label>';
+                return '<input type="checkbox" id="basic_checkbox_' . $row->id . '" class="filled-in">' .
+                    '<label for="basic_checkbox_' . $row->id . '" class="mb-0 h-15 ms-15"></label>';
             })
             ->addColumn('date_needed', function ($row) {
                 return Carbon::parse($row->date_needed)->format('D, d F Y');
+            })
+            ->addColumn('car', function ($row) {
+                return $row->car->car_features();
             })
             ->addColumn('return_date', function ($row) {
                 return Carbon::parse($row->return_date)->format('D, d F Y');
@@ -45,20 +49,41 @@ class MyCarRequestsDataTable extends DataTable
                         '<i class="fa fa-dot-circle-o text-danger"></i> Rejected</a></div>';
 
                 elseif (strtolower($row->status) == 'approved')
-                    return '<div class="action-label">' .
+                    return
+                        '<div class="action-label">' .
                         '<a class="btn btn-white btn-sm btn-rounded" href="javascript:void(0);">' .
                         '<i class="fa fa-dot-circle-o text-success"></i> Approved</a></div>';
             })
+
             ->addColumn('action', function ($row) {
-                if ($row->status == 'pending')
-                return '<div class="dropdown dropdown-action">' .
-                    '<a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>' .
-                    '<div class="dropdown-menu dropdown-menu-right">' .
-                    '<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#edit_employee"><i class="fa fa-pencil m-r-5"></i> Edit</a>' .
-                    '<a class="dropdown-item" href="#" onclick="approveRequest(' . $row->id . ')"><i class="fa fa-check m-r-5"></i> Approve</a>' .
-                    '<a class="dropdown-item" href="#" onclick="rejectRequest(' . $row->id . ')"><i class="fa fa-ban m-r-5"></i> Reject</a>' .
-                    '<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#delete_employee"><i class="fa fa-trash-o m-r-5"></i> Delete</a>' .
-                    '</div></div>'; 
+                if ($row->status == 'pending') {
+                    return '<div class="dropdown dropdown-action">' .
+                        '<a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>' .
+                        '<div class="dropdown-menu dropdown-menu-right">' .
+                        '<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#edit_employee"><i class="fa fa-pencil m-r-5"></i> Edit</a>' .
+                        '<a class="dropdown-item" href="#" onclick="approveRequest(' . $row->id . ')"><i class="fa fa-check m-r-5"></i> Approve</a>' .
+                        '<a class="dropdown-item" href="#" onclick="rejectRequest(' . $row->id . ')"><i class="fa fa-ban m-r-5"></i> Reject</a>' .
+                        '<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#delete_employee"><i class="fa fa-trash-o m-r-5"></i> Delete</a>' .
+                        '</div></div>';
+                }
+                if (Gate::allows('is-driver')) {
+                    if ($row->trip_status == 'started') {
+                        return
+                            '<a class="btn btn-danger text-white btn-sm" href="' . route('driver.vehicle.trip', $row->id) . '">'
+                            . '<span class="badge badge-light"><i class="fas fa-car"></i></span>' .
+                            ' End Trip' .
+                            '</a>';
+                    } else if ($row->trip_status == 'ended') {
+                        return '<div class="action-label">' .
+                            '<a class="btn btn-white btn-sm btn-rounded" href="javascript:void(0);">' .
+                            '<i class="fa fa-dot-circle-o text-warning"></i> Trip Ended</a></div>';
+                    }
+                    return
+                        '<a class="btn btn-success text-white btn-sm" href="' . route('driver.vehicle.trip', $row->id) . '">'
+                        . '<span class="badge badge-light"><i class="fas fa-car"></i></span>' .
+                        ' Start Trip' .
+                        '</a>';
+                }
             })
             ->rawColumns(['checkbox', 'status', 'action']);
     }
@@ -102,11 +127,14 @@ class MyCarRequestsDataTable extends DataTable
      */
     protected function getColumns()
     {
+        $showForAdmin = auth()->user()->hasRole('FLEET MANAGER');
         return [
             Column::make('created_at')->printable(false)->searchable(false)->visible(false),
-            Column::make('checkbox')->title('<input type="checkbox" id="basic_checkbox" class="filled-in"><label for="basic_checkbox" class="mb-0 h-15 ms-15"></label>')->addClass('text-center no-border')->searchable(false)->printable(false)->exportable(false),
+            //Column::makeIf($showForAdmin, 'requested_by')->addClass('text-center no-border'),
+            //Column::make('checkbox')->title('<input type="checkbox" id="basic_checkbox" class="filled-in"><label for="basic_checkbox" class="mb-0 h-15 ms-15"></label>')->addClass('text-center no-border')->searchable(false)->printable(false)->exportable(false),
             Column::make('date_needed')->title('Request&nbsp;Date')->addClass('text-center no-border'),
             Column::make('return_date')->title('Return&nbsp;Date')->addClass('text-center no-border'),
+            Column::make('car')->addClass('text-center no-border'),
             Column::make('request_reason')->title('Request&nbsp;Purpose')->addClass('text-center no-border'),
             Column::computed('status')->addClass('text-center no-border'),
             Column::computed('action')->addClass('text-center no-border')
@@ -118,7 +146,7 @@ class MyCarRequestsDataTable extends DataTable
      *
      * @return string
      */
-    protected function filename():string
+    protected function filename(): string
     {
         return 'CarRegistrationDataTable_' . date('YmdHis');
     }

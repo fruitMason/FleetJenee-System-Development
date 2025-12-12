@@ -23,7 +23,15 @@ class UserDataTable extends DataTable
                 return $row->created_at;
             })
             ->addColumn('checkbox', function ($row) {
-                return '<input type="checkbox" id="basic_checkbox_'.$row->id.'" class="filled-in">' .
+
+                // if ($row->photo) {
+                //     return '<span class="rounded"> <img src="' . asset($row->photo) . '" alt=""></span>';
+                // } else {
+                //     return ' <span class="user-img rounded"> <img src="' . asset('assets/img/9.jpg') . '" alt=""></span>';
+                // }
+
+
+             return   '<input type="checkbox" id="basic_checkbox_'.$row->id.'" class="filled-in">' .
                     '<label for="basic_checkbox_'.$row->id.'" class="mb-0 h-15 ms-15"></label>';
             })
             ->addColumn('name', function ($row) {
@@ -35,24 +43,24 @@ class UserDataTable extends DataTable
             ->editColumn('type', function ($row) {
                 return $row->type ?? 'N/A';
             })
-            ->editColumn('role', function($row) {
+            ->editColumn('role', function ($row) {
                 return $row->getRole();
             })
-            ->addColumn('assigned_modules', function($row) {
+            ->addColumn('assigned_modules', function ($row) {
                 $role = $row->roles->first();
-                if(!is_null($role))
+                if (!is_null($role))
                     return '<div class="btn-group" role="group" aria-label="Action buttons">' .
-                        '<a class="btn btn-xs btn-success" href="'.route('settings.user.permissions', [$row->id, $role->id]).'"' .
+                        '<a class="btn btn-xs btn-success" href="' . route('settings.user.permissions', [$row->id, $role->id]) . '"' .
                         'onclick=""><i class="fa fa-eye text-white" aria-hidden="true"></i></a>' .
                         '</div>';
 
                 return 'N/A';
             })
-            ->addColumn('license', function($row) {
-                    return '<div class="btn-group" role="group" aria-label="Action buttons">' .
-                        '<a class="btn btn-xs btn-success" href="#"' .
-                        'onclick=""><i class="fa fa-eye text-white" aria-hidden="true"></i></a>' .
-                        '</div>';
+            ->addColumn('license', function ($row) {
+                return '<div class="btn-group" role="group" aria-label="Action buttons">' .
+                    '<a class="btn btn-xs btn-success" href="#"' .
+                    'onclick=""><i class="fa fa-eye text-white" aria-hidden="true"></i></a>' .
+                    '</div>';
             })
             ->editColumn('status', function ($row) {
                 if (strtolower($row->status) == 'due_servicing')
@@ -72,11 +80,11 @@ class UserDataTable extends DataTable
             })
             ->addColumn('action', function ($row) {
                 return '<div class="btn-group" role="group" aria-label="Action buttons">' .
-                    '<a class="btn btn-xs btn-success" href="'.route('settings.users.view', $row->id).'"><i class="fa fa-eye text-white" aria-hidden="true"></i></a>' .
+                    '<a class="btn btn-xs btn-success" href="' . route('settings.users.view', $row->id) . '"><i class="fa fa-eye text-white" aria-hidden="true"></i></a>' .
                     '<a class="btn btn-xs btn-primary" href="#"' .
-                    'onclick="editNotify('.$row->id.')"><i class="fa fa-edit text-white" aria-hidden="true"></i></a>' .
+                    'onclick="editNotify(' . $row->id . ')"><i class="fa fa-edit text-white" aria-hidden="true"></i></a>' .
                     '<a class="btn btn-xs btn-danger" href="#"' .
-                    'onclick="deleteNotify('.$row->id.')"><i class="fa fa-trash-o text-white" aria-hidden="true"></i></a>' .
+                    'onclick="deleteNotify(' . $row->id . ')"><i class="fa fa-trash-o text-white" aria-hidden="true"></i></a>' .
                     '</div>';
             })
             ->rawColumns(['license', 'assigned_modules', 'checkbox', 'status', 'action']);
@@ -143,7 +151,7 @@ class UserDataTable extends DataTable
      *
      * @return string
      */
-    protected function filename():string
+    protected function filename(): string
     {
         return 'UserDataTable_' . date('YmdHis');
     }

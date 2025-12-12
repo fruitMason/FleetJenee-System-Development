@@ -24,12 +24,12 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label class="col-form-label">Request Date <span class="text-danger">*</span></label>
-                                        <input type="date" name="date_needed" class="form-control" value="{{today()->toDateString()}}">
+                                        <input type="date" name="date_needed" class="form-control" value="{{today()->toDateString()}}" required>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="col-form-label">Return Date <span class="text-danger">*</span></label>
-                                        <input type="date" name="return_date" class="form-control" value="">
+                                        <input type="date" name="return_date" class="form-control" value="" required>
                                     </div>
                                 </div>
 
@@ -38,7 +38,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-12">Request Purpose <span class="text-danger">*</span>
-                                        <textarea class="form-control" name="request_reason" rows="7"></textarea>
+                                        <textarea class="form-control" name="request_reason" rows="7" required></textarea>
                                     </div>
                                 </div>
 

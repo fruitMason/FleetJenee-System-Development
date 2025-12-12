@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 use function Illuminate\Log\log;
@@ -25,7 +26,7 @@ class PaymentRequestsDataTable extends DataTable
                 return  $row->request_date ? Carbon::parse($row->request_date)->format('d F Y') : 'N/A';
             })
             ->addColumn('car', function ($row) {
-                return $row->car->car_features();
+                return $row->car? $row->car->car_features() : 'N/A';
             })
             ->addColumn('payment_type', function ($row) {
                 return ucwords($row->payment_type);
@@ -64,11 +65,14 @@ class PaymentRequestsDataTable extends DataTable
                         '<a class="btn btn-success text-white btn-sm" href="' . route('accounts.payment.process.payment', $row->id) . '">'
                         . '<span class="badge badge-light"><i class="fas fa-credit-card"></i></span>' .
                         'Pay' .
-                        '</a>';
+                        '</a>'
+                    ;
                 }
                 return 'Paid !';
             })
             ->rawColumns(['checkbox', 'status', 'fin_status', 'action']);
+
+             
     }
 
     /**

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Helpers\Notifications;
 use App\Traits\GlobalValueCore;
 use Illuminate\Support\Facades\Log;
+use Stevebauman\Location\Facades\Location;
 
 use function back;
 
@@ -69,7 +70,7 @@ class DriverManagerController extends Controller
 
 
 
-            $message = 'The car with number ' . $car->car_number . ' has exceeded ' . number_format($odometerLevel)  . ' km. Current value is '.number_format($create->new_value) .' km. Please schedule maintenance.';
+            $message = 'The car with number ' . $car->car_number . ' has exceeded ' . number_format($odometerLevel)  . ' km. Current value is ' . number_format($create->new_value) . ' km. Please schedule maintenance.';
             $naloMes = str_replace(' ', '+', $message);
             $mobile = User::find(1)->mobile;
 
@@ -90,6 +91,106 @@ class DriverManagerController extends Controller
     public function showCarRequests(Request $request, MyCarRequestsDataTable $dataTable)
     {
         return $dataTable->render('drivers.requests.car');
+    }
+    public function startTrip(Request $request, CarRequest $carRequest)
+    {
+        $ip = $request->ip(); // Static IP: $ip = '162.159.24.227';
+        $location = Location::get($ip);
+        Log::info($location);
+        Log::info('id:' . $ip);
+        Log::info('location');
+        return view('drivers.requests.trip', [
+            'carRequest' => $carRequest,
+            'location' => $location
+        ]);
+    }
+    public function startTripStore(Request $request, CarRequest $carRequest)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'odometer' => 'required',
+            'location' => 'required',
+            'comment' => 'nullable'
+        ]);
+
+        if ($validator->fails()) {
+            return Redirect::back()->with(['errors' => $validator->errors()]);
+        }
+
+
+        //eturn $carRequest; // $request;
+        $carRequest->start_time = now();
+        $carRequest->trip_status = 'started';
+        $carRequest->start_odometer = $request->odometer;
+        $carRequest->end_odometer = $request->odometer;
+        $carRequest->start_location = $request->location;
+        $carRequest->end_location = $request->location;
+        $carRequest->start_comment = $request->comment ?? 'N/A';
+        $carRequest->end_comment = $request->comment ?? 'N/A';
+        $carRequest->save();
+
+        //save new odometer reading
+        $create = OdometerHistory::query()->create([
+            'car_id' => $carRequest->car->id,
+            'new_value' => $request->odometer,
+            'old_value' => $carRequest->car->odometer,
+            'created_at' => now(),
+            'user_id' => $request->user()->id
+        ]);
+        $carRequest->car->update(['odometer' => $request->odometer]);
+
+
+
+        Notifications::createNotification($carRequest->user_id, 'New Trip Started', 'New Trip Started Now (Car:' . $carRequest->car->car_features() . ' , Request Detail: ' . $carRequest->request_reason . ')');
+        Notifications::createNotification(1, 'New Trip Started', 'New Trip Started Now (Car:' . $carRequest->car->car_features() . ', Request Detail: ' . $carRequest->request_reason . '. Driver: ' . $request->user()->full_name() . '). ');
+
+        return back()->with('success', 'New Trip Started Successfully, Hit on end trip when you are done!');
+    }
+    public function endTripStore(Request $request, CarRequest $carRequest)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'odometer' => 'required',
+            'location' => 'required',
+            'comment' => 'nullable'
+        ]);
+
+        if ($validator->fails()) {
+            return Redirect::back()->with(['errors' => $validator->errors()]);
+        }
+
+
+        //eturn $carRequest; // $request;
+        $carRequest->start_time = now();
+        $carRequest->trip_status = 'ended';
+        // $carRequest->start_odometer = $request->odometer;
+        $carRequest->end_odometer = $request->odometer;
+        // $carRequest->start_location = $request->location;
+        $carRequest->end_location = $request->location;
+        // $carRequest->start_comment = $request->comment ?? 'N/A';
+        $carRequest->end_comment = $request->comment ?? 'N/A';
+        $carRequest->save();
+
+        //save new odometer reading
+        $create = OdometerHistory::query()->create([
+            'car_id' => $carRequest->car->id,
+            'new_value' => $request->odometer,
+            'old_value' => $carRequest->car->odometer,
+            'created_at' => now(),
+            'user_id' => $request->user()->id
+        ]);
+        
+        $carRequest->car->update(['odometer' => $request->odometer, 'user_id' => '0']);
+
+        //return car to pool
+        //$count_trips = CarRequest::where('user_id',$request)->
+
+
+
+        Notifications::createNotification($carRequest->user_id, 'Trip Ended', 'New Trip Started Now (Car:' . $carRequest->car->car_features() . ' , Request Detail: ' . $carRequest->request_reason . ')');
+        Notifications::createNotification(1, 'Trip Ended', 'New Trip Ended Now (Car:' . $carRequest->car->car_features() . ', Request Detail: ' . $carRequest->request_reason . '. Driver: ' . $request->user()->full_name() . '). ');
+
+        return back()->with('success', 'Trip Ended Successfully, Hit on end trip when you are done!');
     }
 
     public function approveRequest(Request $request)

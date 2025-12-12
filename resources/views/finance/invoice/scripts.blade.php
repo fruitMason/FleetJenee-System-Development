@@ -101,7 +101,7 @@
                         fetched_products = data
 
                         $.each(fetched_products, function(i, product) {
-                            console.log('product', product);
+                            //console.log('product', product);
 
                             product_data.id = product.id
 
@@ -1035,6 +1035,7 @@
         $('#formInvoice').submit(function(e) {
             e.preventDefault();
             let vendor_id = $('#vendor_id option:selected').val()
+            console.log('vendor-id', vendor_id);
             let invoice_number_type = $('#invoice_number_type option:selected').val();
             let invoice_number = $('#invoice_number').val();
             let due_date = $('#due_date').val()
@@ -1049,8 +1050,13 @@
             let vat_total = $('#vat_total').val();
             let covid_total = $('#covid_total').val();
             let vat_flat_total = $('#vat_flat_total').val();
-            {{-- let maintenance_id = '{{request()->get('maintenance_id')}}' --}}
-            let maintenance_id = $('#maintenance_id option:selected').val();
+            //{{-- let maintenance_id = '{{request()->get('maintenance_id')}}' --}}
+            //let maintenance_id = $('#maintenance_id option:selected').val();
+            let maintenance_id = $('select[name="maintenance_id"]').val();//if its empty supply 0
+            console.log('main',maintenance_id);
+            maintenance_id = maintenance_id ? maintenance_id : 0;
+            let invoice_type = $('select[name="invoice_type"]').val() ;
+
 
             let data = {
                 vendor_id,
@@ -1069,7 +1075,8 @@
                 covid_total,
                 vat_flat_total,
                 product_rows,
-                maintenance_id
+                maintenance_id,
+                invoice_type
             }
 
             if (invoice_number_type === 'manual' && invoice_number === '') {

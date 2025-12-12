@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('page_title', 'Accounts Invoice')
+@section('page_title', 'New Auto Part')
 @section('css')
     <link rel="stylesheet" href="{{ asset('assets/css/dataTables.bootstrap4.min.css') }}">
 @endsection

@@ -33,152 +33,161 @@
                     </div>
                 </div>
 
+
                 <div class="row">
-                    <div class="col-sm-12">
-                        <div class="row">
-                            <div class="col-sm-6 col-md-3">
-                                <div class="form-group">
-                                    <label>Vendor <span class="text-danger">*</span></label>
-                                    <select class="select" name="vendor_id" id="vendorSelect">
-                                        <option value="0">-- select vendor --</option>
-                                        @foreach ($vendors as $vendor)
-                                            <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6 col-md-3">
-                                <div class="form-group">
-                                    <label>Invoice Number Type <span class="text-danger">*</span></label>
-                                    <select class="select" name="invoice_number_type" id="invoice_number_type">
-                                        <option value="auto" selected>AUTO GENERATED</option>
-                                        <option value="manual">MANUAL</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6 col-md-3">
-                                <div class="form-group">
-                                    <label>Invoice Number</label>
-                                    <input id="invoice_number" name="invoice_number" class="form-control" type="text"
-                                        readonly>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6 col-md-3">
-                                <div class="form-group">
-                                    <label>Due Date <span class="text-danger">*</span></label>
-                                    <div class="cal-icon">
-                                        <input id="due_date" name="due_date" class="form-control datetimepicker"
-                                            type="text">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6 col-md-6">
-                                <div class="form-group">
-                                    <label>Maintenance (Work Order) <span class="text-danger">*</span></label>
-                                    <select class="select user-search2" name="maintenance_id" id="search2" required>
-                                        <option value="">Select an Item</option>
-                                        @foreach ($maintenances as $maintenance)
-                                            <option @if (request()->get('maintenance_id') == $maintenance->id) selected @endif
-                                                value="{{ $maintenance->id }}">{{ $maintenance->car->model }}
-                                                ({{ $maintenance->car->car_number }})
-                                                -
-                                                {{ $maintenance->start_date->format('d-m-Y') }}
-                                                [{{ $maintenance->comment }}]
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-
-                            <div class="col-sm-6 col-md-3">
-                                <div class="form-group">
-                                    <label>Reference</label>
-                                    <textarea id="reference" name="reference" class="form-control" rows="3"></textarea>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <div class="form-group">
-                                    <label>Message on Invoice (Remarks)</label>
-                                    <textarea id="message" name="message" class="form-control" rows="3"></textarea>
-                                </div>
-                            </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label>Vendor <span class="text-danger">*</span></label>
+                            <select class="select" name="vendor_id" id="vendor_id" required> {{-- id="vendorSelect" --}}
+                                <option value="0">-- select vendor --</option>
+                                @foreach ($vendors as $vendor)
+                                    <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
+                    </div>
 
-                        <hr class="mt0 mb15" />
-                        <div class="row" id="row_item_table">
-                            <div class="col-md-12">
-
-                                <div class="table-responsive">
-                                    <table id="mainTable"
-                                        class="table table-hover table-striped text-center table-bordered">
-                                        <thead>
-                                            <tr class="text-center">
-                                                <th>Item</th>
-                                                <th>Desc.</th>
-                                                <th>Unit Price</th>
-                                                <th>Quantity</th>
-                                                <th>Tax</th>
-                                                <th>Total Amt.</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tbody" style="width: 200px">
-                                        </tbody>
-                                    </table>
-                                    <a href="javascript:void(0);" class="btn btn-dark ml-3 mt-3 mb-3"
-                                        id="add_prod_btn"><span class="fa fa-plus-circle"></span> Add Line Item</a>
-                                </div>
-                            </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label>Invoice Number Type <span class="text-danger">*</span></label>
+                            <select class="select" name="invoice_number_type" id="invoice_number_type" required>
+                                <option value="auto" selected>AUTO GENERATED</option>
+                                <option value="manual">MANUAL</option>
+                            </select>
                         </div>
+                    </div>
 
-                        <div class="row" style="padding-top: 10px">
-                            <div class="col-md-3 form-inline">
-                                <label class="col-form-label">VAT Total</label>
-                                <input class="form-control col-md-8" id="vat_total" disabled name="vat_total">
-                            </div>
-                            <div class="col-md-3 form-inline">
-                                <label class="col-form-label">GetFund Total</label>
-                                <input class="form-control col-md-8" id="getfund_total" disabled name="getfund_total">
-                            </div>
-                            <div class="col-md-3 form-inline">
-                                <label class="col-form-label">NHIL Total</label>
-                                <input class="form-control col-md-8" id="nhil_total" disabled name="nhil_total">
-                            </div>
-                            <div class="col-md-3 form-inline">
-                                <label class="col-form-label">COVID -19 LEVY</label>
-                                <input class="form-control col-md-8" id="covid_total" disabled name="covid_total">
-                            </div>
-
+                    <div class="col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label>Invoice Number</label>
+                            <input id="invoice_number" name="invoice_number" class="form-control" type="text" readonly>
                         </div>
-                        <div class="row mt-5">
-                            <div class="col-md-3 form-inline">
-                                <label class="col-form-label">CST Total</label>
-                                <input class="form-control col-md-8" id="cst_total" disabled name="cst_total">
-                            </div>
-                            <div class="col-md-3 form-inline">
-                                <label class="col-form-label">VAT Flat Total</label>
-                                <input class="form-control col-md-8" id="vat_flat_total" disabled name="vat_">
-                            </div>
-                            <div class="col-md-3 form-inline">
-                                <label class="col-form-label">Subtotal</label>
-                                <input class="form-control col-md-8" id="all_sub_total" disabled name="subtotal">
-                            </div>
-                            <div class="col-md-3 form-inline">
-                                <label class="col-form-label">TAX total</label>
-                                <input class="form-control col-md-8" id="all_tax" disabled>
-                            </div>
-                            <div class="col-md-3 form-inline">
-                                <label class="col-form-label">Net total</label>
-                                <input class="form-control col-md-8" id="all_net" disabled>
+                    </div>
+
+                    <div class="col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label>Due Date <span class="text-danger">*</span></label>
+                            <div class="cal-icon">
+                                <input id="due_date" name="due_date" class="form-control datetimepicker" type="text">
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-sm-6 col-md-6">
+                        <div class="form-group">
+                            <label>Invoice Type <span class="text-danger">*</span></label>
+                            <select class="select" name="invoice_type" id="invoice_type" required style="width: 100%">
+                                <option value="">Select an Item</option>
+                                <option value="maintenance">Maintance </option>
+                                <option value="auto part">Auto Parts Purchase</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-6">
+                        <div class="form-group">
+                            <label>Maintenance (Work Order) <span class="text-danger">*</span></label>
+                            <select class="select user-search2" name="maintenance_id" id="search2" style="width: 100%">
+                                <option value="">Select an Item</option>
+                                @foreach ($maintenances as $maintenance)
+                                    <option @if (request()->get('maintenance_id') == $maintenance->id) selected @endif
+                                        value="{{ $maintenance->id }}">{{ $maintenance->car->model }}
+                                        ({{ $maintenance->car->car_number }})
+                                        -
+                                        {{ $maintenance->start_date->format('d-m-Y') }}
+                                        [{{ $maintenance->comment }}]
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6 col-md-6">
+                        <div class="form-group">
+                            <label>Reference</label>
+                            <textarea id="reference" name="reference" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6">
+                        <div class="form-group">
+                            <label>Message on Invoice (Remarks)</label>
+                            <textarea id="message" name="message" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="mt0 mb15" />
+                <div class="row" id="row_item_table">
+                    <div class="col-md-12">
+
+                        <div class="table-responsive">
+                            <table id="mainTable" class="table table-hover table-striped text-center table-bordered">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>Item</th>
+                                        <th>Desc.</th>
+                                        <th>Unit Price</th>
+                                        <th>Quantity</th>
+                                        <th>Tax</th>
+                                        <th>Total Amt.</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody" style="width: 200px">
+                                </tbody>
+                            </table>
+                            <a href="javascript:void(0);" class="btn btn-dark ml-3 mt-3 mb-3" id="add_prod_btn"><span
+                                    class="fa fa-plus-circle"></span> Add Line Item</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-top: 10px">
+                    <div class="col-md-3 form-inline">
+                        <label class="col-form-label">VAT Total</label>
+                        <input class="form-control col-md-8" id="vat_total" disabled name="vat_total">
+                    </div>
+                    <div class="col-md-3 form-inline">
+                        <label class="col-form-label">GetFund Total</label>
+                        <input class="form-control col-md-8" id="getfund_total" disabled name="getfund_total">
+                    </div>
+                    <div class="col-md-3 form-inline">
+                        <label class="col-form-label">NHIL Total</label>
+                        <input class="form-control col-md-8" id="nhil_total" disabled name="nhil_total">
+                    </div>
+                    <div class="col-md-3 form-inline">
+                        <label class="col-form-label">COVID -19 LEVY</label>
+                        <input class="form-control col-md-8" id="covid_total" disabled name="covid_total">
+                    </div>
+
+                </div>
+                <div class="row mt-5">
+                    <div class="col-md-3 form-inline">
+                        <label class="col-form-label">CST Total</label>
+                        <input class="form-control col-md-8" id="cst_total" disabled name="cst_total">
+                    </div>
+                    <div class="col-md-3 form-inline">
+                        <label class="col-form-label">VAT Flat Total</label>
+                        <input class="form-control col-md-8" id="vat_flat_total" disabled name="vat_">
+                    </div>
+                    <div class="col-md-3 form-inline">
+                        <label class="col-form-label">Subtotal</label>
+                        <input class="form-control col-md-8" id="all_sub_total" disabled name="subtotal">
+                    </div>
+                    <div class="col-md-3 form-inline">
+                        <label class="col-form-label">TAX total</label>
+                        <input class="form-control col-md-8" id="all_tax" disabled>
+                    </div>
+                    <div class="col-md-3 form-inline">
+                        <label class="col-form-label">Net total</label>
+                        <input class="form-control col-md-8" id="all_net" disabled>
+                    </div>
+                </div>
+
             </form>
         </div>
 
@@ -208,13 +217,28 @@
         });
 
 
+        $('#invoice_type').change(function() {
+           const invoiceType = $('#invoice_type').val();
+            const maintenanceField = $('#search2');
+
+            if (invoiceType === 'maintenance') {
+                maintenanceField.prop('disabled', false);
+                maintenanceField.prop('required', true);
+            } else {
+                maintenanceField.prop('disabled', true);
+                maintenanceField.prop('required', false);
+                maintenanceField.val(''); // Clear the value when disabled
+            }
+        });
+
+
         $(document).ready(function() {
             console.log('document ready');
 
             $('.user-search2').select2();
             // $('.car-search2').select2();
 
-            
+
         });
 
 

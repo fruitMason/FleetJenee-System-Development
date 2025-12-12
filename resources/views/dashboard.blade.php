@@ -3,6 +3,8 @@
 @section('content')
 <div class="page-wrapper">
 
+     
+
     <div class="content container-fluid">
 
         <div class="page-header">
@@ -18,7 +20,7 @@
         </div>
 
         <div class="row">
-
+ 
             <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
                 <div class="card dash-widget">
                     <a style="color: inherit !important;" href="{{route('fleet.vehicle.registration')}}">

@@ -176,6 +176,7 @@ class RolePermissionController extends Controller
                     ' Damaged Parts Processing',
                     ' Auto Parts',
 
+
                     'Invoices',
 
                     'Reports >>',
@@ -211,6 +212,7 @@ class RolePermissionController extends Controller
                     'Elog Report',
                     'Waybill',
                     'Car Requests',
+                    'Auto Part Requests',
                 ];
 
 
@@ -355,6 +357,7 @@ class RolePermissionController extends Controller
                 'Elog Report',
                 'Waybill',
                 'Car Requests',
+                'Auto Part Requests',
             ];
 
 

@@ -7,6 +7,7 @@ use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FinanceRequestsDataTable extends DataTable
 {
@@ -50,17 +51,17 @@ class FinanceRequestsDataTable extends DataTable
                 return !is_null($row->for_user) ? $row->for_user->full_name() . ' ('.$row->car_assigned.')'  : 'N/A';
             })
             ->addColumn('action', function ($row) {
-                if (auth()->user()->can('account_management')) {
-                    if ($row->status == 'pending' || $row->status == 'partially paid') {
-                        return
-                            '<a class="btn btn-success text-white btn-sm" href="' . route('accounts.payment.process.payment', $row->id) . '">'
-                            . '<span class="badge badge-light"><i class="fas fa-credit-card"></i></span>' .
-                            'Pay' .
-                            '</a>';
-                    }
-                }else{
+                // if (Auth::user()->hasRole('FLEET MANAGER')) {
+                //     if ($row->status == 'pending' || $row->status == 'partially paid') {
+                //         return
+                //             '<a class="btn btn-success text-white btn-sm" href="' . route('accounts.payment.process.payment', $row->id) . '">'
+                //             . '<span class="badge badge-light"><i class="fas fa-credit-card"></i></span>' .
+                //             'Approve' .
+                //             '</a>';
+                //     }
+                // }else{
 
-                }
+                // }
                 if ($row->status == 'pending') {
                     return '<div class="text-danger">' . ucwords($row->status) . "</div>";
                 } else if ($row->status == 'paid') {

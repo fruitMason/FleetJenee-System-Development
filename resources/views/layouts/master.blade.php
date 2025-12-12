@@ -62,7 +62,6 @@
                             height="50" alt="">
                     </a>
                 @else
-                
                     <a href="#" class="logo">
                         <img style="width: 100px" src="{{ asset('assets/img/fleetjeneelogo.jpg') }}" width="50"
                             height="50" alt="">
@@ -126,19 +125,18 @@
 
                 <li class="nav-item dropdown">
                     <a href="admin-dashboard.html#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
-                        <i class="fa fa-bell-o"></i> <span
-                            class="badge rounded-pill">{{ count($notifications) }}</span>
+                        <i class="fa fa-bell-o"></i> <span class="badge rounded-pill">{{ $noti_count }}</span>
                     </a>
                     <div class="dropdown-menu notifications">
                         <div class="topnav-dropdown-header">
                             <span class="notification-title">Notifications</span>
-                            <a href="javascript:void(0)" class="clear-noti"> Clear All </a>
+                            <a href="{{ route('mynotification') }}" class="clear-noti text-primary"> View All </a>
                         </div>
                         <div class="noti-content">
                             <ul class="notification-list">
                                 @foreach ($notifications as $notification)
                                     <li class="notification-message">
-                                        <a href="#">
+                                        <a href="{{ route('mynotification') }}">
                                             <div class="media d-flex">
                                                 <span class="avatar flex-shrink-0">
                                                     @if ($notification->toUser && $notification->toUser->normalUrl())
@@ -151,7 +149,8 @@
                                                 </span>
                                                 <div class="media-body flex-grow-1">
                                                     <p class="noti-details"><span
-                                                            class="noti-title">{{ mb_substr($notification->body, 0, 100) }}...</span>
+                                                            class="noti-title">{{ mb_substr($notification->body, 0, 100) }}...
+                                                        </span>
                                                     </p>
                                                     <p class="noti-time"><span
                                                             class="notification-time">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
@@ -164,7 +163,7 @@
                             </ul>
                         </div>
                         <div class="topnav-dropdown-footer">
-                            <a href="#">View all Notifications</a>
+                            <a href="{{ route('mynotification') }}">View all Notifications</a>
                         </div>
                     </div>
                 </li>
@@ -273,11 +272,19 @@
                 {{--                    </div> --}}
                 {{--                </div> --}}
                 {{--            </li> --}}
-
+{{-- {{auth()->user()->photo}} --}}
                 <li class="nav-item dropdown has-arrow main-drop">
                     <a href="admin-dashboard.html#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
-                        <span class="user-img"><img src="{{ asset('assets/img/9.jpg') }}" alt="">
-                            <span class="status online"></span></span>
+                        <span class="user-img">
+                            @if (auth()->user()->photo)
+                                <img src="{{ asset(auth()->user()->photo) }}" alt="">
+                            @else
+                                <img src="{{ asset('assets/img/9.jpg') }}" alt="">
+                            @endif
+
+
+                            <span class="status online"></span>
+                        </span>
                         <span>{{ auth()->user()->full_name() }}</span>
                     </a>
                     <div class="dropdown-menu">
@@ -304,7 +311,7 @@
         @include('layouts.side')
         @yield('content')
         @include('layouts.footer')
- 
+
         <!--my sweet alert codes--->
         <script src="{{ asset('assets/js/mysweet-alert.js') }}"></script>
 

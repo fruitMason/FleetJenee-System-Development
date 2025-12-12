@@ -56,7 +56,7 @@
                                     <div class="col-md-3">
                                         <label class="col-form-label">Amount </label>
                                         <input type="text" class="form-control" id="total"
-                                            value="{{ $invoice->net_total }}" disabled>
+                                            value="{{ number_format($invoice->net_total,2) }}" disabled>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="col-form-label">Invoice Date | Reference </label>
@@ -74,9 +74,15 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label class="col-form-label">Work Order Details </label>
-                                    <input type="text" class="form-control" id="total"
-                                        value="{{ $invoice->car_maintenance->car->model }} ({{ $invoice->car_maintenance->car->car_number }}) - {{ $invoice->car_maintenance->start_date->format('d-m-Y') }} | {{ $invoice->car_maintenance->comment }}  "
-                                        disabled>
+                                    @if ($invoice->invoice_type == 'maintenance')
+                                        <input type="text" class="form-control" id="total"
+                                            value="{{ $invoice->car_maintenance->car->model }} ({{ $invoice->car_maintenance->car->car_number }}) - {{ $invoice->car_maintenance->start_date->format('d-m-Y') }} | {{ $invoice->car_maintenance->comment }}  "
+                                            disabled>
+                                    @else
+                                        <input type="text" class="form-control" id="total"
+                                            value="Auto Parts Purchase" disabled>
+                                    @endif
+
                                 </div>
                             </div>
 

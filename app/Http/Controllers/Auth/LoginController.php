@@ -17,7 +17,6 @@ class LoginController extends Controller
 
     public function signIn(Request $request)
     {
-
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             // Log::info(Auth::user()->type);
             if (\auth()->user()->type == 'DRIVER') {

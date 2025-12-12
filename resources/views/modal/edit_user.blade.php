@@ -97,7 +97,7 @@
                                             onchange="toggleDriverType()" required>
                                             <option value="">-- select Type --</option>
                                             <option value="DRIVER">Driver Login</option>
-                                            <option value="MANAGER">Fleet Manager Login</option>
+                                            <option value="ADMINISTRATOR">Fleet Manager Login</option>
                                             <option value="MECHANIC">Mechanic Login</option>
                                             <option value="ACCOUNT">Finance Manager Login</option>
                                         </select>

@@ -48,7 +48,7 @@ class FinanceController extends Controller
         //        })->get();
         $vendors = Vendor::all();
         $taxes = Tax::all();
-        $maintenances = CarMaintenance::query()->with(['car'])->where('status','<>','completed')->get();
+        $maintenances = CarMaintenance::query()->with(['car'])->where('status', '<>', 'completed')->get();
 
         return view('finance.invoice.create', [
             'vendors' => $vendors,
@@ -65,6 +65,10 @@ class FinanceController extends Controller
         $data = $request->all();
 
         $validate = Validator::make($data, $this->validateRules($data));
+
+        // Log::info($data);
+
+
 
         if ($validate->fails()) {
             return response()->json(['code' => 401, 'message' => 'The data given is invalid.',  'errors' => $validate->errors()->all()]);
@@ -129,6 +133,8 @@ class FinanceController extends Controller
                 $_selected_taxes = json_encode($row_from_grid['selected_tax_ids_from_grid']);
 
                 $invoice_item_data['invoice_id'] = $invoice->id;
+                Log::info("selected");
+                Log::info($invoice_item_data);
                 $invoice_item = InvoiceItem::query()->create($invoice_item_data);
                 $invoice_item->update([
                     'tax_amount' => array_key_exists('tax_amount', $row_from_grid) ? $row_from_grid['tax_amount'] : 0,
@@ -152,25 +158,20 @@ class FinanceController extends Controller
             $invoice->update($selected_taxes);
 
 
-            Log::info($data);
+            Log::info('invoice_data');
+            Log::info($invoice_data);
 
-            //this is no longer used --:: there are be multiple invoices from one work order
-            // if ($request->filled('maintenance_id')) {
-            //     Log::info($request->maintenance_id);
-            //     CarMaintenance::where('id', $request->maintenance_id)->update(['invoice_id' => $invoice->id]);
-            //     Log::info('maintenance updated');
-            // }
 
-            // Log::info($request->all());
-            // return $request->all();
-            // insert into car_maintenance notes
-            $note = CarMaintenanceNote::create([
-                'car_maintenance_id' => $request->maintenance_id,
-                'status' => 'Invoice Generated',
-                'receipt_comment' => 'Invoice Generated. Msg: ' . $request->message . '. Ref: ' . $request->reference,
-                'receipt_date' => Carbon::now(),
-                'user_email' => $request->user()->id,
-            ]);
+            if ($invoice_data['invoice_type'] == 'maintenance') {
+                $note = CarMaintenanceNote::create([
+                    'car_maintenance_id' => $request->maintenance_id,
+                    'status' => 'Invoice Generated',
+                    'receipt_comment' => 'Invoice Generated. Msg: ' . $request->message . '. Ref: ' . $request->reference,
+                    'receipt_date' => Carbon::now(),
+                    'user_email' => $request->user()->id,
+                ]);
+            }
+
 
             DB::commit();
 
@@ -229,7 +230,8 @@ class FinanceController extends Controller
             'vat_flat_total' => $data['vat_flat_total'],
             'created_by' => Auth::user()->id,
             'edited_by' => Auth::user()->id,
-            'car_maintenance_id' => $data['maintenance_id']
+            'car_maintenance_id' => $data['maintenance_id'] ?? 0,
+            'invoice_type' => $data['invoice_type']
         ];
     }
 
@@ -290,15 +292,29 @@ class FinanceController extends Controller
         return redirect()->back()->with('error', 'Invoice not found.');
     }
 
+    public function destroyInvoice(Invoice $invoice)
+    {
+
+        InvoiceItem::where('invoice_id', $invoice->id)->delete();
+        $invoice->delete();
+        return redirect()->back()->with('success', 'Invoice Deleted Successfully !!');
+    }
+
     public function createSubmitToFinance(Invoice $invoice)
     {
         $users =  User::select('id', 'first_name', 'middle_name', 'last_name', 'type')
-            ->where('type', '<>', 'MECHANIC')->orderBy('first_name')->get();
+            ->where('type', 'ACCOUNT')->orderBy('first_name')->get();
 
         return view(
             'main_fleet.finance_requests.push-invoice-to-finance',
             ['invoice' => $invoice, 'users' => $users]
         );
+    }
+
+    protected function financeOfficer()
+    {
+        $fin = User::where('type', 'ACCOUNT')->where('status', 'active')->first();
+        return $fin->id;
     }
 
     public function submitToFinance(Request $request)
@@ -309,16 +325,24 @@ class FinanceController extends Controller
         ]);
         $notify_user = $request->notify_user;
         $invoice = Invoice::find($request->tidnew);
+        $invoice_type = $invoice->invoice_type;
+
         //Log::info($invoice);
         $work_order = CarMaintenance::find($invoice->car_maintenance_id);
-        //Log::info($work_order);
+        //message 
+        $formattedDate = Carbon::parse($invoice->due_date)->format('d/m/Y');
+        if ($invoice_type == 'maintenance') {
+            $car = $work_order->car->model . ' (' . $work_order->car->car_number . ')';
+        } else {
+            $car = 'Auto parts';
+        }
+        $amount = 'GHS ' . number_format($invoice->net_total, 2);
+        $message = 'New invoice ' . $invoice->invoice_number . ' generated for ' . $car . ', Vendor: ' . $invoice->vendor->name . '. Amount : ' . $amount . '. Due ' . $formattedDate . '. Kindly process payment.';
+        ///
         $SMSStatus = "No SMS";
         if ($notify_user) {
             $user =  User::find($notify_user);
-            $formattedDate = Carbon::parse($invoice->due_date)->format('d/m/Y');
-            $car = $work_order->car->model . ' (' . $work_order->car->car_number . ')';
-            $amount = 'GHS ' . number_format($invoice->net_total, 2);
-            $message = 'New invoice ' . $invoice->invoice_number . ' generated for ' . $car . ' - ' . $invoice->vendor->name . '. Amount : ' . $amount . '. Due ' . $formattedDate . '. Kindly process payment.';
+
             $naloMes = str_replace(' ', '+', $message);
             try {
 
@@ -330,24 +354,25 @@ class FinanceController extends Controller
                 $SMSStatus = $SMSStatus . "|| sms not sent : " . $e->getMessage();
                 Log::error('sms-error' . $e->getMessage());
             }
+        } else {
+            $user_id = $this->financeOfficer();
+            Notifications::createNotification($user_id ,'Finance Request - Invoice', $message);
         }
-
-
-
 
 
         if (DB::table('payment_requests')->where('description', 'Invoice Payment Request. Invoice No: ' . $invoice->invoice_number)->exists()) {
             return redirect()->back()->with('error', 'Invoice Already Subitted To Finance !!');
         }
 
-        $car = Car::find($work_order->car_id);
-        $user = "1";
+        $user = "0";
         $user_ass = "Unassigned";
-        if ($car->user) {
-            $user = $car->user->id;
-            $user_ass = "Assigned";
+        if ($invoice_type == 'maintenance') {
+            $car = Car::find($work_order->car_id);
+            if ($car->user) {
+                $user = $car->user->id;
+                $user_ass = "Assigned";
+            }
         }
-
 
 
         if ($invoice) {
@@ -357,14 +382,14 @@ class FinanceController extends Controller
             //create payment request for account
             PaymentRequest::create([
                 'user_id' => $request->user()->id,
-                'payment_type' => 'maintenance',
+                'payment_type' => $invoice_type,
                 'description' => 'Invoice Payment Request. Invoice No: ' . $invoice->invoice_number,
                 'amount' => $invoice->net_total,
                 'status' => 'pending',
                 'amount_paid' => 0,
                 'for_user_id' => $user,
                 'request_date' => now(),
-                'car_id' => $work_order->car_id,
+                'car_id' => $invoice_type == 'maintenance' ? $work_order->car_id : null,
                 'car_assigned' => $user_ass,
                 'invoice_no' => $invoice->id
 

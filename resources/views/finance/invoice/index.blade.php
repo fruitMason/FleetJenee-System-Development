@@ -122,7 +122,7 @@
 
 
 
-        function notifyAccountModal(id, invoice_number, vendor, total) { //id,invoice_number,total
+        function notifyAccountModal(id, invoice_number, vendor, total) { //id,invoice_number,total||
             console.log(id);
 
             waitme('card_content');

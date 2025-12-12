@@ -64,8 +64,8 @@ class CarRequestDataTable extends DataTable
                         '<div class="dropdown-menu dropdown-menu-right">' .
                         '<a class="dropdown-item" href="#"' .
                         'onclick="approveNotify(' . $row->id . ',' . $row->user->id . ',\'' .  $row->request_reason  . '\',\'' . $requester  . '\')"><i class="fa fa-check m-r-5"></i> Approve</a>' .
-                        '<a class="dropdown-item" href="#"' .
-                        'onclick="rejectNotify(' . $row->id . ')"><i class="fa fa-ban m-r-5"></i> Reject</a>' .
+                        // '<a class="dropdown-item" href="#"' .
+                        // 'onclick="rejectNotify(' . $row->id . ')"><i class="fa fa-ban m-r-5"></i> Reject</a>' .
                         '</div></div>';
             })
             ->rawColumns(['checkbox', 'status', 'action', 'car_group']);

@@ -122,7 +122,7 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => Hash::make('passWORD@fleet.new'),
             'mobile' => '233209366367',
-            'status' => 'Active',
+            'status' => 'active',
             'department_id' => '1',
             'gender' => 'Male',
             'type' => 'ADMINISTRATOR',

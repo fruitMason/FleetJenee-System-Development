@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inventories', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('car_maintenances', function (Blueprint $table) {
+        $table->decimal('odometer')->default(0);
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('inventories');
+        Schema::table('car_maintenances', function (Blueprint $table) {
+            //
+        });
     }
 };

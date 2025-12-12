@@ -41,7 +41,7 @@
                         <div class="card-title">Request Detail </div>
 
                         <form method="post" class="maintenanceForm"
-                            onsubmit="return SubmitDelete(this,'Submit Maintenance Order');" 
+                            onsubmit="return SubmitDelete(this,'Submit Maintenance Order');"
                             action="{{ route('fleet.vehicle.registration.maintain') }}">
                             @csrf
                             <div class="row">
@@ -58,7 +58,7 @@
                                                 </input>
                                             </div>
 
-                                            <div class="col-md-6">
+                                            <div class="col-md-3">
                                                 <label class="col-form-label">Type <span
                                                         class="text-danger">*</span></label>
                                                 <select class="form-control select" name="type" id="type" required>
@@ -66,6 +66,14 @@
                                                     <option value="breakdown">Break Down</option>
                                                     <option value="normal" selected>Normal Routine</option>
                                                 </select>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="col-form-label">Odometer Reading Now<span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control" type="number" name="odometer" id="odometer"
+                                                    required value="{{ old('odometer', $car->odometer) }}"
+                                                    step="0.1">
                                             </div>
                                         </div>
                                     </div>

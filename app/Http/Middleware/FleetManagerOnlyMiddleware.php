@@ -19,9 +19,10 @@ class FleetManagerOnlyMiddleware
     {
         if (Auth::check()) {
             $user = Auth::user();
-            Log::info('Fleet Man Middleware');
+            //  Log::info($user);
 
             if ($user?->type === 'ADMINISTRATOR') {
+                // Log::info('next - fleet');
                 return $next($request);
             }
             if ($user?->type === 'DRIVER') {

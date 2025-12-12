@@ -4,9 +4,6 @@ namespace App\Listeners;
 
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-
 class RecordLastLogin
 {
     /**

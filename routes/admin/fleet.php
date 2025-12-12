@@ -20,6 +20,7 @@ use App\Http\Controllers\Fleet\UsersController;
 use App\Http\Controllers\Fleet\RegistrationController;
 use App\Http\Controllers\Fleet\VendorsController;
 use App\Models\OdometerSetting;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 
@@ -51,7 +52,7 @@ Route::prefix('fleet')->middleware('fleetManagerOnly')->group(function () {
     Route::get('odometer/history/{car_id}', [RegistrationController::class, 'showOdometerHistory'])->name('fleet.vehicle.odometer.history');
 
     Route::get('insurance', [RegistrationController::class, 'insurance'])->name('fleet.vehicle.insurance');
-    Route::get('driver/license', [RegistrationController::class, 'driverLicense'])->name('fleet.vehicle.driver.license')->middleware('can:fleet_management');
+    Route::get('driver/license', [RegistrationController::class, 'driverLicense'])->name('fleet.vehicle.driver.license');
 
     Route::prefix('car-requests')->group(function () {
         Route::get('index', [RequestController::class, 'index'])->name('fleet.vehicle.request');
@@ -110,8 +111,23 @@ Route::prefix('fleet')->middleware('fleetManagerOnly')->group(function () {
     //-------------------INVENTORY MANAGER---------------
     Route::prefix('inventory')->group(function () {
         Route::get('index', [InventoryController::class, 'index'])->name('inventory.index');
-        Route::get('create', [InventoryController::class, 'create'])->name('inventory.create');
-        Route::post('store', [InventoryController::class, 'store'])->name('inventory.store');
+        Route::get('{id}/details', [InventoryController::class, 'show'])->name('inventory.show');
+
+        //purchase
+        Route::get('purchase/index', [InventoryController::class, 'purchaseIndex'])->name('inventory.purchase.index');
+
+        // Route::get('purchase/create', [InventoryController::class, 'purchaseCreate'])->name('inventory.purchase.create');
+        // Route::get('purchase/{id}/show', [InventoryController::class, 'purchaseShow'])->name('inventory.purchase.show');
+        // Route::post('purchase/store', [InventoryController::class, 'purchaseStore'])->name('inventory.purchase.store');
+
+        //usage
+        Route::get('usage/index', [InventoryController::class, 'usageIndex'])->name('inventory.usage.index');
+        Route::get('usage/{auto_part_request}/show', [InventoryController::class, 'usageShow'])->name('inventory.usage.show');
+        Route::post('usage/auth', [InventoryController::class, 'usageAuth'])->name('inventory.usage.auth');
+        //admin usage
+        Route::get('usage/index/create', [InventoryController::class, 'usageRequestAdmin'])->name('inventory.usage.admin');
+        Route::post('usage/index/store', [InventoryController::class, 'usageRequestStore'])->name('inventory.usage.store');
+        //damage
     });
 });
 
@@ -201,6 +217,7 @@ Route::prefix('finance')->middleware('fleetManagerOnly')->group(function () {
         Route::get('create', [FinanceController::class, 'showCreateInvoice'])->name('finance.invoice.create');
         ///Route::get('get-orders-by-vendor', [FinanceController::class, 'workOrderByVendor'])->name('finance.invoice.orders.by.vendor');
         Route::post('store', [FinanceController::class, 'storeInvoice'])->name('finance.invoice.store');
+        Route::delete('destroy/{invoice}', [FinanceController::class, 'destroyInvoice'])->name('finance.invoice.destroy');
         Route::post('status/update', [FinanceController::class, 'updateStatus'])->name('finance.invoice.status.update');
         Route::post('status/tofinance', [FinanceController::class, 'submitToFinance'])->name('finance.invoice.submittofinance');
         Route::get('status/{invoice}/tofinance', [FinanceController::class, 'createSubmitToFinance'])->name('finance.invoice.submittofinance.create');

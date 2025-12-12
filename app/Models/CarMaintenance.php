@@ -44,7 +44,8 @@ class CarMaintenance extends Model
         'fin_user',
         'fin_comment',
         'user_id',
-        'normal_overdue'
+        'normal_overdue',
+        'odometer'
     ];
 
     protected $casts = [

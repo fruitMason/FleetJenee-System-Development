@@ -16,7 +16,7 @@ class CreateNotifications extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title')->index();
-            $table->string('body')->nullable();
+            $table->text('body')->nullable();
             $table->unsignedBigInteger('to_user_id')->nullable()->index();
             $table->boolean('unread')->default(false)->index();
             $table->softDeletes();

@@ -18,6 +18,7 @@ use App\Models\Car;
 use App\Models\CarMaintenance;
 use App\Models\CarMaintenanceNote;
 use App\Models\Department;
+use App\Models\OdometerHistory;
 use App\Models\OdometerSetting;
 use App\Models\Region;
 use App\Models\User;
@@ -186,6 +187,8 @@ class RegistrationController extends Controller
 
     public function maintain(Request $request)
     {
+
+
         $car = Car::query()->find($request->car_id);
 
         //check if car work order has been raised
@@ -218,7 +221,8 @@ class RegistrationController extends Controller
             'comment' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date',
-            'overdue' => 'nullable'
+            'overdue' => 'nullable',
+            'odometer' => 'nullable'
         ]);
 
 
@@ -232,21 +236,28 @@ class RegistrationController extends Controller
         $data['normal_overdue'] = $request->overdue ?? 'Normal';
 
 
-
-
         $car_maintenance = CarMaintenance::query()->create($data);
+
+        if ($request->odometer > 0) {
+            $oldVal = $car->odometer;
+
+            $create = OdometerHistory::query()->create([
+                'car_id' => $car->id,
+                'new_value' => $request->odometer,
+                'old_value' =>  $oldVal,
+                'created_at' => now(),
+                'user_id' => $request->user()->id
+            ]);
+            $car->odometer = $request->odometer;
+            $car->save();
+        }
+
+
 
         if ($request->overdue) {
             return back()->with('success', 'Car maintenance work order raised, pending authorization from finance');
         }
         return response()->json(['code' => 200, 'message' => 'Car work order raised, pending authorization from finance', 'url' => 'NO']);
-
-
-        //return response()->json(['code' => 200, 'message' => 'Work Order Added successfully!', 'url' => route('finance.invoice.create', ['maintenance_id' => $car_maintenance->id])]);
-
-        //        return response()->json(['code' => 200, 'message' => 'Car Sent to Maintenance successfully!', 'url' => route('finance.invoice.create', ['maintenance_id' => $car_maintenance->id])]);
-
-        //        
     }
 
     public function viewMaintenance(Request $request, $maintenance_id)
@@ -294,11 +305,11 @@ class RegistrationController extends Controller
         ]);
 
         $garage->car()->update(['status' => 'active']);
-        
+
 
         // Notify fleet management about the status update
         Notifications::createNotification(
-            '1',   
+            '1',
             'Car Maintenance Status Updated',
             'The car maintenance status for car number ' . $garage->car->car_number . ' has been updated to completed.'
         );
@@ -306,7 +317,6 @@ class RegistrationController extends Controller
 
 
         return back()->with('sucess', 'Work order completed sucessfully - admin !');
-        
     }
 
     public function viewDiagnosisOnly(Request $request, $maintenance_id)
@@ -385,6 +395,12 @@ class RegistrationController extends Controller
 
         // Update the resource with validated data
         $data = $validator->validated();
+        $userid = $data['user_id'];
+        if ($userid) {
+            Log::info($userid.'--user id');
+            $data['car_group'] = 'assigned';
+        }
+
         $resource->update($data);
 
         return $this->sendSuccessJsonResponse('Car was UPDATED successfully!');

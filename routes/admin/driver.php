@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Driver\AccidentReportController;
+use App\Http\Controllers\Driver\AutoPartRequestController;
 use App\Http\Controllers\Driver\DriverManagerController;
 use App\Http\Controllers\Driver\RequestController;
+use App\Models\CarRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +22,7 @@ Route::prefix('driver')->middleware('driverOnly')->group(function () {
         $ongoing_waybills = \App\Models\Waybill::isOngoing()->whereBelongsTo(Auth::user(), 'driver')->count();
         $rejected_waybills = \App\Models\Waybill::isRejected()->whereBelongsTo(Auth::user(), 'driver')->count();
         $completed_waybills = \App\Models\Waybill::isCompleted()->whereBelongsTo(Auth::user(), 'driver')->count();
+        $my_trip =  CarRequest::where('user_id',Auth::user()->id)->count();
 
         return view('drivers.dashboard', [
             'total_car_requests' => $total_car_requests,
@@ -30,7 +33,10 @@ Route::prefix('driver')->middleware('driverOnly')->group(function () {
             'pending_waybills' => $pending_waybills,
             'ongoing_waybills' => $ongoing_waybills,
             'rejected_waybills' => $rejected_waybills,
-            'completed_waybills' => $completed_waybills
+            'completed_waybills' => $completed_waybills,
+            'my_trip' => $my_trip,
+            
+
         ]);
     })->name('driver.dashboard');
 
@@ -39,8 +45,21 @@ Route::prefix('driver')->middleware('driverOnly')->group(function () {
         Route::post('/', [DriverManagerController::class, 'storeOdometer'])->name('driver.odometer');
     });
 
+    Route::prefix('auto-requests')->group(function () {
+        Route::get('index', [AutoPartRequestController::class, 'index'])->name('driver.auto.request');
+        Route::post('index', [AutoPartRequestController::class, 'store'])->name('driver.auto.request');
+        Route::delete('destroy/{auto_part_request}', [AutoPartRequestController::class, 'destroy'])->name('driver.auto.request.destroy');
+        //Route::get('index', [AutoPartRequestController::class, 'index'])->name('driver.auto.request');
+        // Route::post('approve', [AutoPartRequestController::class, 'approveRequest'])->name('driver.auto.request.approve');
+        // Route::post('reject', [AutoPartRequestController::class, 'rejectRequest'])->name('driver.auto.request.reject');
+
+    });
+
     Route::prefix('car-requests')->group(function () {
         Route::get('index', [DriverManagerController::class, 'showCarRequests'])->name('driver.vehicle.request');
+        Route::get('{carRequest}/start', [DriverManagerController::class, 'startTrip'])->name('driver.vehicle.trip');
+        Route::post('{carRequest}/start/store', [DriverManagerController::class, 'startTripStore'])->name('driver.vehicle.trip.start');
+        Route::post('{carRequest}/start/end', [DriverManagerController::class, 'endTripStore'])->name('driver.vehicle.trip.end');
         Route::post('approve', [DriverManagerController::class, 'approveRequest'])->name('driver.vehicle.request.approve');
         Route::post('reject', [DriverManagerController::class, 'rejectRequest'])->name('driver.vehicle.request.reject');
         Route::post('index', [RequestController::class, 'store'])->name('driver.vehicle.request');

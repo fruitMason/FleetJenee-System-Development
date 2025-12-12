@@ -1,10 +1,10 @@
 @extends('layouts.master')
 
-@section('page_title', 'View Maintenance Work Order')
+@section('page_title', 'Inventory')
 
-{{-- @section('css')
+@section('css')
     <link rel="stylesheet" href="{{ asset('assets/css/dataTables.bootstrap4.min.css') }}">
-@endsection --}}
+@endsection
 
 @section('content')
     <div class="page-wrapper">
@@ -16,104 +16,46 @@
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h3 class="page-title">Auto Part Purchase Request</h3>
+                        <h3 class="page-title">Available Auto Parts</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"> <a href="{{ route('finance.requests.home') }}">Requests</a> </li>
-                            <li class="breadcrumb-item active">Auto Parts Purchases</li>
+                            <li class="breadcrumb-item"> <a href="{{ route('auto.parts.index') }}">Auto Parts</a> </li>
+                            <li class="breadcrumb-item active">Auto Parts Available - Inventory</li>
                         </ul>
                     </div>
-                    <div class="col-auto float-end ms-auto">
-                        <a href="{{ route('inventory.create') }}" class="btn add-btn"><i class="fas fa-tools"></i>
-                            New Request - Stock In
+                    <div class="col-auto float-end ms-auto"> 
+                        <a href="{{ route('finance.invoice.create') }}" class="btn add-btn"><i class="fas fa-tools"></i>
+                            Purchase Request - Stock In
                         </a>
-
-                        <a href="{{ route('auto.parts.index') }}" class="btn add-btn"><i class="fas fa-tools"></i>
-                            Auto Parts</a>
+                        
+                        
                     </div>
                 </div>
             </div>
 
 
-
-
-            <section class="panel panel-default">
-                <div class="card mg-b-20" id="card_content">
-                    <div class="card-body">
-                        <div class="card-title">Request Detail </div>
-
-                        <div>Under Construction!</div>
-                        
-                        {{-- <form method="post" action="{{ route('finance.requests.general.store') }}"
-                            onsubmit="return SubmitDelete(this,'Save General Request');" class="confirmationForm"
-                            enctype="multipart/form-data">
-                            @csrf
-
-                            <!-- First Row - 3 equal columns -->
-                            <div class="row">
-                                <!-- Input 1 -->
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <div class="form-focus select-focus">
-                                            <label for="descriptiont" class="d-block mb-2">
-                                                Request Date <span class="text-danger">*</span>
-                                            </label>
-
-                                            <input type="date" name="request_date" class="form-control"
-                                                value="{{ old('request_date') }}" required>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Input 2 -->
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <div class="form-group form-focus select-focus">
-
-                                            <label for="descriptiont" class="d-block mb-2">
-                                                Request Amount <span class="text-danger">*</span>
-                                            </label>
-                                            <input type="number" name="amount" id="amount" step="0.1"
-                                                class="form-control" required value="{{ old('amount') }}">
-                                        </div>
-                                    </div>
-                                </div>
-
-                             
-                            </div>
-
-                            <!-- Second Row - 1 input taking 2/3 width -->
-                            <div class="row mb-3">
-                                <!-- Large Input (2/3 width) -->
-                               
-
-                            </div>
-
-                            <!-- 3rd row -->
-
-                            <div class="mb-3 row">
-                                <div class="col-md-8">
-                                    <label for="descriptiont" class="d-block mb-2">
-                                        Naration
-                                    </label>
-                                    <textarea class="form-control" name="description" id="description" rows="5">{{ old('naration') }}</textarea>
-                                </div>
-                            </div>
-
-                            <div class="mb-3 row">
-                                <div class="col-md-12 ">
-                                    <button class="btn btn-primary submit-btn" type="submit">Submit</button>
-                                </div>
-                            </div>
-
-                        </form> --}}
-
+            <div class="row filter-row">
+                <div class="col-md-3">
+                    <div class="form-group form-focus select-focus">
+                        <select class="select floating" id="paymentTypeGroupFilter">
+                            <option value="">-- Part Status --</option>
+                            <option value="available">Available</option>
+                            <option value="out">Out Of Stock</option> 
+                        </select>
+                        <label class="focus-label">Status</label>
                     </div>
                 </div>
+                <div class="col-sm-6 col-md-3">
+                    <button type="button" id="btnStatusFilter" class="btn btn-success w-100"> Filter </button>
+                </div>
+            </div>
 
-            </section>
-
-
-
+            <div class="row" id="card_content">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        {!! $dataTable->table(['class' => 'table table-striped custom-table']) !!}
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -121,39 +63,24 @@
 
 
 @section('js')
+    {!! $dataTable->scripts() !!}
 
+    <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/dataTables.bootstrap4.min.js') }}"></script>
 
-    <script src="{{ asset('assets/js/select2.min.js') }}"></script>
 
     <script>
-        // In your Javascript (external .js resource or <script> tag)
         $(document).ready(function() {
-            console.log('document ready');
 
+            $('#btnStatusFilter').on('click', function() {
+                var filterValue = $('#paymentTypeGroupFilter').val();
+                
+                console.log(filterValue);
 
-
-            const carSelect = document.getElementById('carSelect');
-            // console.log(carSelect);
-
-            $('#carSelect').on('change', function() {
-                var selectedValue = $(this).val();
-                var selectedText = $(this).find('option:selected').text();
-
-                console.log('Selected Car ID:', selectedValue);
-                // console.log('Selected Car Text:', selectedText); 
-                if (selectedText.toLowerCase().includes('pool')) {
-
-                    $('#id_for_user_id').val('1');
-                    $('#id_for_user_id').prop('disabled', true);
-                } else {
-
-                    $('#id_for_user_id').prop('disabled', false);
-                    $('#id_for_user_id').val('');
-                }
-
+                $('#dataTableBuilder').DataTable().ajax.url(
+                    '{{ route('inventory.index') }}?filter=' + filterValue).load();
             });
         });
     </script>
-
 
 @endsection

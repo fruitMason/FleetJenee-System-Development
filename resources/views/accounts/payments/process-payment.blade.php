@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('page_title', 'View Maintenance Work Order')
+@section('page_title', 'Payment Processing')
 
 {{-- @section('css')
     <link rel="stylesheet" href="{{ asset('assets/css/dataTables.bootstrap4.min.css') }}">
@@ -41,7 +41,7 @@
                                 <div class="row mb-4">
                                     <div class="col-md-4">
                                         <div class="title">Request Type:</div>
-                                        <div class="text"> {{ ucwords($request->payment_type) }}</div>
+                                        <div class="text fw-bold"> {{ ucwords($request->payment_type) }}</div>
                                     </div>
                                     <div class="col-md-4">
                                         <div>Status:</div>
@@ -76,7 +76,7 @@
                                     <div class="col-md-4">
                                         <div class="text-bold">In Favor Of</div>
                                         <div> {{ $request->for_user ? $request->for_user->full_name() : 'N/A' }}
-                                            {{$request->car_assigned == 'Unassigned' ? ': FM' : "Assigned" }}
+                                            {{ $request->car_assigned == 'Unassigned' ? ': FM' : 'Assigned' }}
                                         </div>
                                     </div>
 
@@ -85,10 +85,22 @@
                                 </div>
 
                                 <div class="row ">
-                                    <div class="col-md-12">
+
+                                    @if ($request->payment_type == 'maintenance')
+                                        <div class="col-md-4">
+                                            <div>Car Info</div>
+                                            <div>
+                                                {{ $request->car->car_features() }}
+                                            </div>
+                                        </div>
+                                    @endif
+
+
+                                    <div class="col-md-8">
                                         <div>Description</div>
                                         <div> {{ $request->description }}</div>
                                     </div>
+
                                 </div>
                             </div>
 
@@ -187,6 +199,50 @@
                 </div>
 
             </section>
+            {{-- //end Payment Details --}}
+
+
+            {{-- Auto Parts Details --}}
+            @if ($request->payment_type == 'auto part')
+                <section class="panel panel-default">
+                    <div class="card">
+                        <div class="card-header card-title">
+                            Auto Parts Summary
+                        </div>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Auto Part</th>
+                                    <th scope="col">Quanity</th>
+                                    <th scope="col">TotalAmount</th>
+                                    <th scope="col">Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($invoice_items as $item)
+                                    <tr>
+                                        @php
+                                            $total = $item->total + $item->tax_amount;
+                                            $unit = $total / $item->quantity;
+                                        @endphp
+                                        <th scope="row"> {{ $loop->index }} </th>
+                                        <td>{{ $item->name }},</td>
+                                        <td>{{ $item->quantity }} </td>
+                                        <td> {{ number_format($total, 2) }}</td>
+                                        <td> {{ number_format($unit, 2) }}</td>
+                                    </tr>
+                                @endforeach
+
+                            </tbody>
+                        </table>
+
+
+                    </div>
+                </section>
+            @endif
+            {{-- //Auto Parts Details --}}
+
 
         </div>
     </div>

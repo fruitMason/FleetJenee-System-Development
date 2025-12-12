@@ -8,18 +8,31 @@
                 </button>
             </div>
             <div class="modal-body" id="modal_body">
-                <form method="post" enctype="multipart/form-data" action="{{route('fleet.vehicle.request.approve')}}">
+                <form method="post" enctype="multipart/form-data"
+                    action="{{ route('fleet.vehicle.request.approve') }}">
                     @csrf
-                    <input type="hidden" id="approve_car_request_id" name="approve_car_request_id"/>
-                    <input type="hidden" id="approve_car_user_id" name="approve_car_user_id"/>
+                    <input type="hidden" id="approve_car_request_id" name="approve_car_request_id" />
+                    <input type="hidden" id="approve_car_user_id" name="approve_car_user_id" />
 
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-form-label">Request For : </label>
                                 <input type="text" class="form-control" id="requester" disabled>
                             </div>
                         </div>
+
+                        
+                        <div class="col-md-6">
+                            <label class="col-form-label">Assign Car To <span class="text-danger">*</span></label>
+                            <select class="form-control select" name="user_id" required>
+                                <option>-- Select User --</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->full_name() }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label class="col-form-label">Reason For Request </label>
@@ -29,18 +42,30 @@
                     </div>
 
                     <div class="row">
-                        
+
                         <div class="col-md-12">
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-md-12">
-                                            <label class="col-form-label">Assign Car <span class="text-danger">*</span></label>
-                                            <select class="form-control select" name="car_id" required>
-                                                <option>-- select car --</option>
-                                                @foreach($cars as $car)
-                                                    <option value="{{$car->id}}">{{$car->model}} ({{$car->car_number}})</option>
-                                                @endforeach
-                                            </select>
+                                    <div class="col-md-8">
+                                        <label class="col-form-label">Assign Car <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-control select" name="car_id" required>
+                                            <option>-- select car --</option>
+                                            @foreach ($cars as $car)
+                                                <option value="{{ $car->id }}">{{ $car->model }}
+                                                    ({{ $car->car_number }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="col-form-label">Status<span class="text-danger">*</span></label>
+                                        <select class="form-control select" name="status" required>
+                                            <option value="">-- Select Status--</option>
+                                            <option value="approved">Approve</option>
+                                            <option value="declined">Decline</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
