@@ -20,7 +20,12 @@ class FinanceRequestsDataTable extends DataTable
                 return  $row->request_date ? Carbon::parse($row->request_date)->format('d F Y') : 'N/A';
             })
             ->addColumn('car', function ($row) {
-                return $row->car->car_features();
+                if ($row->car_id != null){
+                  return $row->car->car_features();  
+                }else{
+                    return 'N/A';
+                }
+                
             })
             ->addColumn('payment_type', function ($row) {
                 return ucwords($row->payment_type);
