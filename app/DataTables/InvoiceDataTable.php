@@ -127,18 +127,18 @@ class InvoiceDataTable extends DataTable
                 return      '<div class="dropdown dropdown-action">' .
                     '<a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>' .
                     '<div class="dropdown-menu dropdown-menu-right">' .
-                    '<a class="dropdown-item" href="#"><i class="fa fa-pencil m-r-5"></i> Edit</a>' .
+                    // '<a class="dropdown-item" href="#"><i class="fa fa-pencil m-r-5"></i> Edit</a>' .
                     '<a class="dropdown-item" href="' . route('finance.invoice.view', $row->id) . '"><i class="fa fa-eye m-r-5"></i> View</a>' .
                     // '<a class="dropdown-item" href="#"><i class="fa fa-file-pdf-o m-r-5"></i> Download</a>' .
-                    '<a class="dropdown-item" href="#"><i class="fa fa-trash-o m-r-5"></i> Delete</a>' .
-                    '<a class="dropdown-item" href="#"><i class="fa fa-trash-o m-r-5"></i> Delete' .
-                    '<form method="post" action="' . route('auto.parts.destroy', $row->id) . '"
-                                    onsubmit="return SubmitDelete(this,\'Delete Auto Part [' . $row->name . ']\');" >' .
+                    // '<a class="dropdown-item" href="#"><i class="fa fa-trash-o m-r-5"></i> Delete</a>' .
+                    '<a class="dropdown-item" href="#"> ' .
+                    '<form method="post" action="' . route('finance.invoice.destroy', $row->id) . '"
+                                    onsubmit="return SubmitDelete(this,\'Delete Pending   [' . ucfirst($row->invoice_type) . '] Invoice\');" >' .
                     csrf_field() .
                     method_field('DELETE') .
 
                     '<button type="submit" class="btn btn-xs btn-danger" href="#" onclick="archiveNotify(' . $row->id . ')">
-                            <i class="fa fa-trash text-white" aria-hidden="true"></i>
+                            <i class="fa fa-trash text-white" aria-hidden="true"></i> Delete
                             </button>' .
                     '</form></a>' .
 

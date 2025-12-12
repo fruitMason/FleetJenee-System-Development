@@ -32,7 +32,7 @@ class MyCarRequestsDataTable extends DataTable
                 return Carbon::parse($row->date_needed)->format('D, d F Y');
             })
             ->addColumn('car', function ($row) {
-                return $row->car->car_features();
+                return '';//$row->car->car_features();
             })
             ->addColumn('return_date', function ($row) {
                 return Carbon::parse($row->return_date)->format('D, d F Y');

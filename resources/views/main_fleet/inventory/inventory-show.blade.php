@@ -85,6 +85,7 @@
                                         <h4>Auto Part Movement History</h4>
                                     </div>
                                     {{--  --}}
+                                    {{-- {{$auto->autoPartStatement}} --}}
                                     <div class="table-responsive">
                                         <table class="table  table-hover table-sm">
                                             <thead class="bg-dark text-white">

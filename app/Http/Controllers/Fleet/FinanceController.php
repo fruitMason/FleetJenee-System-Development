@@ -57,20 +57,36 @@ class FinanceController extends Controller
         ]);
     }
 
+       public function storeInvoiceNew(Request $request)
+    {
+ 
+        $_user = Auth::user();
+
+        $data = $request->all();
+
+         
+
+        Log::info('data-');
+        Log::info($data);
+    }
+
     public function storeInvoice(Request $request)
     {
-
+ 
         $_user = Auth::user();
 
         $data = $request->all();
 
         $validate = Validator::make($data, $this->validateRules($data));
 
-        // Log::info($data);
+        Log::info('data-');
+        Log::info($data);
 
 
 
         if ($validate->fails()) {
+                
+                 //$request->session()->flash('success', $validate->errors()->first());
             return response()->json(['code' => 401, 'message' => 'The data given is invalid.',  'errors' => $validate->errors()->all()]);
         }
 

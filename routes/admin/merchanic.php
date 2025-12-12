@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Fleet\FinanceController;
 use App\Http\Controllers\Mechanic\MechanicManagerController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -32,4 +33,7 @@ Route::prefix('mechanic')->group(function () {
         Route::post('confirm/completed', [MechanicManagerController::class, 'confirmCompleted'])->name('mechanic.garage.confirm.completed');
         Route::get('view/completed/{id}', [MechanicManagerController::class, 'showGarageCompletedReceipt'])->name('mechanic.garage.completed.view');
     });
+
+
+     Route::post('store/new', [FinanceController::class, 'storeInvoice'])->name('finance.invoice.store.new');
 });

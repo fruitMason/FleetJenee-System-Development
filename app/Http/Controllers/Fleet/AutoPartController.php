@@ -13,7 +13,7 @@ class AutoPartController extends Controller
 {
     public function purchaseIndex(Request $request)
     {
-        return view('main_fleet.inventory.inventory-purchase');
+        return view('main_fleet.inventory.inventory-purchase',['autoParts'=>[]]);
     }
 
     public function index(AutoPartsDataTable $dataTable)

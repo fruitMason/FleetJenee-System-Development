@@ -114,7 +114,7 @@
                         <div class="bg-white rounded-lg p-6 mb-6">
 
 
-                            <form id="submitOrder" method="POST" action="{{ route('inventory.purchase.store') }}"
+                            <form id="submitOrder" method="POST" action="#"
                                 onsubmit="return SubmitDelete(this,'Submit Auto Part Stock In Request');">
                                 @csrf
                                 <div class="overflow-x-auto">

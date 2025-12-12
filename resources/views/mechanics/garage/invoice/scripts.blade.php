@@ -1,6 +1,5 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
-
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -19,8 +18,7 @@
 
         let fetched_products = []
 
-        function styleSelectTags()
-        {
+        function styleSelectTags() {
             $(".selected_grid_product").select2({
                 tags: true
             });
@@ -31,18 +29,28 @@
 
         let fetched_taxes = []
 
-        let discount_array = [
-            {'name': 'Discount','value': 'discount'},
-            {'name': 'Interest','value': 'interest'}
+        let discount_array = [{
+                'name': 'Discount',
+                'value': 'discount'
+            },
+            {
+                'name': 'Interest',
+                'value': 'interest'
+            }
         ]
 
-        let discount_types_array = [
-            {'name': 'Percentage','value': 'percentage'},
-            {'name': 'Fixed Amount','value': 'amount'}
+        let discount_types_array = [{
+                'name': 'Percentage',
+                'value': 'percentage'
+            },
+            {
+                'name': 'Fixed Amount',
+                'value': 'amount'
+            }
         ]
 
         let input_description = {
-            row_id : 0,
+            row_id: 0,
             description: ''
         }
 
@@ -68,50 +76,51 @@
 
         let prepared_products = [];
 
-        let fetch_products_url = `{{route('getProductsAndServices')}}`
+        let fetch_products_url = `{{ route('getProductsAndServices') }}`
 
-        let fetch_taxes_url = `{{route('getTaxes')}}`
+        let fetch_taxes_url = `{{ route('getTaxes') }}`
 
         fetchData(fetch_products_url)
 
         fetchData(fetch_taxes_url)
 
-        function fetchData(url)
-        {
+        function fetchData(url) {
             waitme("row_item_table");
 
             $.ajax({
                 url
             }).done((data) => {
-                if(!jQuery.isEmptyObject(data))
-                {
-                    if(url === `{{route('getTaxes')}}`)
-                    {
+                if (!jQuery.isEmptyObject(data)) {
+                    if (url === `{{ route('getTaxes') }}`) {
                         fetched_taxes = data
 
-                    }else {
+                    } else {
 
                         let product_data = {}
 
                         fetched_products = data
 
-                        $.each(fetched_products, function (i, product) {
+                        $.each(fetched_products, function(i, product) {
+                            console.log('product - info - ', product.name);
+
 
                             product_data.id = product.id
 
-                            product_data.description = product.model+' ('+product.car_number+')'
+                            product_data.description = product.name
 
-                            product_data.item_type = 'car'
+                            product_data.item_type = 'auto_part'
 
                             product_data.quantity = 1
+                            product_data.unit_price = product.unit_cost !== null ? product
+                                .unit_cost : 1
 
-                            product_data.unit_price = product.car_cost !== null ? product.car_cost : 1
-
-                            product_data.sub_total = product.car_cost !== null ? product.car_cost : 1
+                            product_data.sub_total = product.unit_cost !== null ? product
+                                .unit_cost : 1
 
                             prepared_products.push(product_data)
 
                             product_data = {}
+
                         })
                     }
                     hidewaitme('row_item_table');
@@ -119,13 +128,12 @@
             })
         }
 
-        $('#add_prod_btn').on('click', function () {
+        $('#add_prod_btn').on('click', function() {
             displayRowItems()
             addRow();
         })
 
-        function updateItemQuantity(selected_row_id, input_item_quantity)
-        {
+        function updateItemQuantity(selected_row_id, input_item_quantity) {
 
             let row_id = selected_row_id.split(',')[0]
 
@@ -133,7 +141,8 @@
 
             let current_row_content = product_rows.find(row_data => row_data.row_id === Number(row_id))
 
-            current_row_content.row_sub_total = Number(current_row_content.unit_price) * Number(input_item_quantity)
+            current_row_content.row_sub_total = Number(current_row_content.unit_price) * Number(
+                input_item_quantity)
 
             current_row_content.quantity = input_item_quantity
 
@@ -144,15 +153,14 @@
 
             $('.input_quantity').focus().val(input_item_quantity);
 
-            if($('.input_quantity').is('.input_quantity:last') && $('.input_quantity').last()){
+            if ($('.input_quantity').is('.input_quantity:last') && $('.input_quantity').last()) {
                 // alert('wow')
                 $('.input_quantity').focus().val(input_item_quantity);
             }
         }
 
 
-        function populateRowTax(row_id, selected_tax_ids_from_grid)
-        {
+        function populateRowTax(row_id, selected_tax_ids_from_grid) {
             //get the content of row from which the product was selected
             let current_row_content = product_rows.find(row_data => row_data.row_id === Number(row_id))
 
@@ -169,23 +177,22 @@
             new_sub_total = sub_total
 
             //loop tru the selected taxes ids
-            $.each(selected_tax_ids_from_grid, function (i, selected_tax_id){
+            $.each(selected_tax_ids_from_grid, function(i, selected_tax_id) {
 
                 console.log(selected_tax_id)
                 //find the tax
-                let selected_tax = fetched_taxes.find(tax_data => tax_data.id === Number(selected_tax_id))
+                let selected_tax = fetched_taxes.find(tax_data => tax_data.id === Number(
+                    selected_tax_id))
 
                 console.log('this is the selected tax: ', selected_tax)
 
                 //check if its vat
-                if(selected_tax !== undefined) {
-                    if(selected_tax.name === 'VAT')
-                    {
+                if (selected_tax !== undefined) {
+                    if (selected_tax.name === 'VAT') {
                         //set the tax percentage
                         vat_percentage = Number(selected_tax.percentage)
 
-                    }
-                    else{
+                    } else {
 
                         let computed_tax_amount = (new_sub_total * selected_tax.percentage) / 100;
 
@@ -199,8 +206,7 @@
             })
 
             //for VAT tax
-            if(vat_percentage > 0)
-            {
+            if (vat_percentage > 0) {
                 //sum all taxes
                 let sum_of_taxes = taxes.reduce((a, b) => a + b, 0)
 
@@ -225,12 +231,12 @@
         }
 
 
-        function GetIndividualTaxes(){
+        function GetIndividualTaxes() {
 
             // Init Variables
 
             let tax_percentage = {
-                    nhil : 0,
+                    nhil: 0,
                     vat: 0,
                     getfund: 0,
                     covid: 0,
@@ -271,11 +277,13 @@
 
             let corp_wth_tax = $('#cop_wth option:selected').data('content');
             let vat_wth_tax = $('#vat_wth option:selected').data('content');
-            let fixed_vat_wth_tax = parseFloat($('#vat_wth_fixed').val()) ? parseFloat($('#vat_wth_fixed').val()) : 0;
-            let fixed_corp_wth_tax = parseFloat($('#cop_wth_fixed').val()) ? parseFloat($('#cop_wth_fixed').val()) : 0;
+            let fixed_vat_wth_tax = parseFloat($('#vat_wth_fixed').val()) ? parseFloat($('#vat_wth_fixed')
+                .val()) : 0;
+            let fixed_corp_wth_tax = parseFloat($('#cop_wth_fixed').val()) ? parseFloat($('#cop_wth_fixed')
+                .val()) : 0;
 
             // Go through list items
-            $.each(product_rows, function (i, row_content){
+            $.each(product_rows, function(i, row_content) {
 
                 console.log("product_rows ", product_rows);
                 // Compute subtotal of each list item
@@ -287,15 +295,15 @@
                 let new_net_total = sub_total;
 
                 // Loop through selected taxes
-                if(row_content.selected_tax_ids_from_grid !== undefined)
-                {
-                    $.each(row_content.selected_tax_ids_from_grid, function (i, selected_tax_id) {
+                if (row_content.selected_tax_ids_from_grid !== undefined) {
+                    $.each(row_content.selected_tax_ids_from_grid, function(i, selected_tax_id) {
 
                         //find the tax item
-                        let selected_tax = fetched_taxes.find(tax_data => tax_data.id === Number(selected_tax_id))
+                        let selected_tax = fetched_taxes.find(tax_data => tax_data.id ===
+                            Number(selected_tax_id))
 
                         // Compute for individual tax items
-                        if(selected_tax !== undefined) {
+                        if (selected_tax !== undefined) {
 
                             if (selected_tax.name.toLowerCase().includes('covid 19')) {
                                 item_type = 'COVID 19 TAX';
@@ -307,7 +315,8 @@
                             if (selected_tax.name.toLowerCase() === 'flat vat') {
                                 item_type = 'Flat VAT';
                                 tax_percentage.flat_vat = Number(selected_tax.percentage);
-                                tax_values.flax_vat = (new_sub_total * tax_percentage.flat_vat) / 100
+                                tax_values.flax_vat = (new_sub_total * tax_percentage
+                                    .flat_vat) / 100
                                 tax_total.flax_vat += tax_values.flax_vat;
                             }
 
@@ -321,7 +330,8 @@
                             if (selected_tax.name.toLowerCase().includes('getfund')) {
                                 item_type = 'GETFund';
                                 tax_percentage.getfund = Number(selected_tax.percentage);
-                                tax_values.getfund = (new_sub_total * tax_percentage.getfund) / 100
+                                tax_values.getfund = (new_sub_total * tax_percentage.getfund) /
+                                    100
                                 tax_total.getfund += tax_values.getfund
                             }
 
@@ -333,7 +343,7 @@
                             }
 
                             math.getfund += tax_total.getfund;
-                            math.nhil    += tax_total.nhil;
+                            math.nhil += tax_total.nhil;
                             math.cst += tax_total.cst;
                             math.covid += tax_total.covid;
                             math.vat += tax_total.flax_vat + tax_total.vat_standard;
@@ -342,17 +352,20 @@
                     })
                 }
 
-                math.sub += parseFloat(sub_total);  //sub total
+                math.sub += parseFloat(sub_total); //sub total
 
-                let new_selected_tax_id = row_content.selected_tax_ids_from_grid.find(vat_id => vat_id === '1');
+                let new_selected_tax_id = row_content.selected_tax_ids_from_grid.find(vat_id =>
+                    vat_id === '1');
 
-                let net_tax = fetched_taxes.find(tax_data => tax_data.id === Number(new_selected_tax_id))
+                let net_tax = fetched_taxes.find(tax_data => tax_data.id === Number(
+                    new_selected_tax_id))
 
-                if(net_tax !== undefined){
+                if (net_tax !== undefined) {
 
                     tax_percentage.vat = Number(net_tax.percentage);
 
-                    tax_values.vat = ((tax_values.nhil + tax_values.covid + tax_values.getfund + tax_values.cst + new_sub_total) * tax_percentage.vat) / 100
+                    tax_values.vat = ((tax_values.nhil + tax_values.covid + tax_values.getfund +
+                        tax_values.cst + new_sub_total) * tax_percentage.vat) / 100
 
                     tax_total.vat += tax_values.vat;
                 }
@@ -370,26 +383,25 @@
             $('#covid_total').val(Number(tax_total.covid).toFixed(2));
             $('#vat_flat_total').val(Number(tax_total.flax_vat).toFixed(2))
 
-            let total_tax = (Number(tax_total.nhil) + Number(tax_total.cst) + Number(tax_total.getfund) + Number(tax_total.vat) + Number(tax_total.covid) + Number(tax_total.flax_vat));
+            let total_tax = (Number(tax_total.nhil) + Number(tax_total.cst) + Number(tax_total.getfund) +
+                Number(tax_total.vat) + Number(tax_total.covid) + Number(tax_total.flax_vat));
             $('#all_tax').val(Number(total_tax).toFixed(2))
             net = (math.sub + total_tax);
             $('#all_net').val(net.toFixed(2));
         }
 
 
-        function RedoTotalCalculations(id = null)
-        {
-            $.each(product_rows, function (i, row_content){
+        function RedoTotalCalculations(id = null) {
+            $.each(product_rows, function(i, row_content) {
 
-                if(row_content.selected_tax_ids_from_grid !== undefined)
-                {
+                if (row_content.selected_tax_ids_from_grid !== undefined) {
                     populateRowTax(row_content.row_id, row_content.selected_tax_ids_from_grid)
                 }
             })
 
-            if(id != null){
-                let get_id = '#'+id;
-                if($(get_id).val() != ''){
+            if (id != null) {
+                let get_id = '#' + id;
+                if ($(get_id).val() != '') {
                     strLength = $(get_id).val().length * 2;
                     changeAttr(get_id, strLength);
                 }
@@ -398,23 +410,22 @@
 
         }
 
-        $('#vat_wth').on('change', function (){
+        $('#vat_wth').on('change', function() {
             RedoTotalCalculations();
         });
 
-        $('#cop_wth').on('change', function (){
+        $('#cop_wth').on('change', function() {
             RedoTotalCalculations();
         });
 
-        function deleteRow(row_id)
-        {
+        function deleteRow(row_id) {
             // delete the process flow from the position
             product_rows = product_rows.filter(row_data => row_data.row_id !== Number(row_id))
 
             //reset the ids actions
             $.each(product_rows, (i, row_data) => {
 
-                row_data.row_id = i +1;
+                row_data.row_id = i + 1;
 
                 row_data.row_action = `<td>
                                             <a href="javascript:void(0);"  title="${row_data.row_id}" class="btn btn-icon shadow btn-danger btn-sm btn-circle mr-2 convert del_row"><i class="fa fa-sm fa-trash"></i></a>
@@ -425,7 +436,7 @@
             displayRowItems()
         }
 
-        function changeAttr(element, length){
+        function changeAttr(element, length) {
             $(element).attr('type', 'text');
             $(element).focus();
             $(element)[0].setSelectionRange(length, length);
@@ -433,27 +444,26 @@
             $(element).focus();
         }
 
-        function checkDiscountType(sub_total,row_content=null)
-        {
+        function checkDiscountType(sub_total, row_content = null) {
 
-            let data = {'discount_amount': 0, 'interest_amount': 0};
+            let data = {
+                'discount_amount': 0,
+                'interest_amount': 0
+            };
 
-            if (row_content.discount_interest_ === 'discount'){
-                if(row_content.discount_interest_type_ === 'percentage')
-                {
+            if (row_content.discount_interest_ === 'discount') {
+                if (row_content.discount_interest_type_ === 'percentage') {
                     data.discount_amount = (Number(row_content.discount_interest_value_) * sub_total) / 100
 
-                }else if(row_content.discount_interest_type_ === 'amount') {
+                } else if (row_content.discount_interest_type_ === 'amount') {
 
                     data.discount_amount = Number(row_content.discount_interest_value_)
                 }
-            }
-            else if(row_content.discount_interest_ === 'interest'){
-                if(row_content.discount_interest_type_ === 'percentage')
-                {
+            } else if (row_content.discount_interest_ === 'interest') {
+                if (row_content.discount_interest_type_ === 'percentage') {
                     data.interest_amount = (Number(row_content.discount_interest_value_) * sub_total) / 100
 
-                }else if(row_content.discount_interest_type_ === 'amount') {
+                } else if (row_content.discount_interest_type_ === 'amount') {
 
                     data.interest_amount = Number(row_content.discount_interest_value_)
                 }
@@ -462,22 +472,20 @@
             return data;
         }
 
-
-        function setProductOptions(selected_product_id=null, item_type=null)
-        {
+        function setProductOptions(selected_product_id = null, item_type = null) {
 
             let product_options = ``
 
-            $.each(fetched_products, function(i, product)
-            {
-                if(selected_product_id !== null)
-                {
+            $.each(fetched_products, function(i, product) {
+                if (selected_product_id !== null) {
                     let product_selected = (product.id === selected_product_id) ? 'selected' : ''
 
-                    product_options += `<option ${product_selected} title="${item_type}" value="${product.id},${item_type}">${product.model ? product.model+' ('+product.car_number+')' : product.car_number}</option>`
-                }else{
+                    product_options +=
+                        `<option ${product_selected} title="${item_type}" value="${product.id},${item_type}">${product.name }</option>`
+                } else {
 
-                    product_options += `<option value="${product.id},${item_type}" title="${item_type}">${product.model ? product.model+' ('+product.car_number+')' : product.car_number}</option>`
+                    product_options +=
+                        `<option value="${product.id},${item_type}" title="${item_type}">${product.name}</option>`
                 }
 
             })
@@ -487,19 +495,16 @@
             return product_options
         }
 
-        function setTaxOptions(selected_tax_id=null)
-        {
+        function setTaxOptions(selected_tax_id = null) {
             tax_options = ``
 
-            $.each(fetched_taxes, function(i, tax)
-            {
-                if(selected_tax_id !== null)
-                {
+            $.each(fetched_taxes, function(i, tax) {
+                if (selected_tax_id !== null) {
                     let tax_selected = tax.id === Number(selected_tax_id) ? 'selected' : ''
 
                     tax_options += `<option ${tax_selected} value="${tax.id}">${tax.name}</option>`
 
-                }else{
+                } else {
 
                     tax_options += `<option value="${tax.id}">${tax.name}</option>`
                 }
@@ -508,19 +513,17 @@
             return tax_options
         }
 
-        function setDiscountOptions(selected_option=null)
-        {
+        function setDiscountOptions(selected_option = null) {
             discount_options = ``
 
-            $.each(discount_array, function(i, option)
-            {
-                if(selected_option !== null)
-                {
+            $.each(discount_array, function(i, option) {
+                if (selected_option !== null) {
                     let option_selected = option.value === selected_option ? 'selected' : ''
 
-                    discount_options += `<option ${option_selected} value="${option.value}">${option.name}</option>`
+                    discount_options +=
+                        `<option ${option_selected} value="${option.value}">${option.name}</option>`
 
-                }else{
+                } else {
 
                     discount_options += `<option value="${option.value}">${option.name}</option>`
                 }
@@ -529,19 +532,17 @@
             return discount_options
         }
 
-        function setDiscountTypes(selected_type=null)
-        {
+        function setDiscountTypes(selected_type = null) {
             discount_types = ``
 
-            $.each(discount_types_array, function(i, option)
-            {
-                if(selected_type !== null)
-                {
+            $.each(discount_types_array, function(i, option) {
+                if (selected_type !== null) {
                     let option_selected = option.value === selected_type ? 'selected' : ''
 
-                    discount_types += `<option ${option_selected} value="${option.value}">${option.name}</option>`
+                    discount_types +=
+                        `<option ${option_selected} value="${option.value}">${option.name}</option>`
 
-                }else{
+                } else {
 
                     discount_types += `<option value="${option.value}">${option.name}</option>`
                 }
@@ -550,8 +551,7 @@
             return discount_types
         }
 
-        function addRow()
-        {
+        function addRow() {
             let new_row_id = product_rows.length + 1
 
             let product_options = setProductOptions()
@@ -566,7 +566,7 @@
                 product_options,
                 discount_options,
                 discount_types,
-                amount : ``,
+                amount: ``,
                 quantity: '',
                 discount_interest_value_: '',
                 discount_interest_: '',
@@ -581,8 +581,7 @@
             displayRowItems()
         }
 
-        function displayRowItems()
-        {
+        function displayRowItems() {
             let main_dom = ``
 
             let all_data_with_tax = {
@@ -593,21 +592,21 @@
                 interested_amount: 0,
             }
 
-            $.each(product_rows, function (i, row_content){
+            $.each(product_rows, function(i, row_content) {
 
-                if(row_content.selected_product_id !== undefined)
-                {
-                    row_content.product_options = setProductOptions(row_content.selected_product_id, item_type)
+                if (row_content.selected_product_id !== undefined) {
+                    row_content.product_options = setProductOptions(row_content.selected_product_id,
+                        item_type)
                 }
 
-                if(row_content.selected_tax_ids_from_grid !== undefined)
-                {
+                if (row_content.selected_tax_ids_from_grid !== undefined) {
 
-                    if((row_content.selected_tax_ids_from_grid !== null ? row_content.selected_tax_ids_from_grid.length : 0))
-                    {
-                        row_content.tax_options = MarkTaxesAsChecked(row_content.selected_tax_ids_from_grid, row_content)
+                    if ((row_content.selected_tax_ids_from_grid !== null ? row_content
+                            .selected_tax_ids_from_grid.length : 0)) {
+                        row_content.tax_options = MarkTaxesAsChecked(row_content
+                            .selected_tax_ids_from_grid, row_content)
 
-                    }else{
+                    } else {
                         row_content.tax_options = setTaxOptions(row_content.selected_tax_id)
                     }
                 }
@@ -618,20 +617,20 @@
 
                 all_data_with_tax.sub_total += Number(row_content.amount)
 
-                if(row_content.apply_row_discount)
-                {
-                    all_data_with_tax.discounted_amount += Number(checkDiscountType(row_content.amount,row_content).discount_amount)
+                if (row_content.apply_row_discount) {
+                    all_data_with_tax.discounted_amount += Number(checkDiscountType(row_content.amount,
+                        row_content).discount_amount)
 
-                    all_data_with_tax.interested_amount += Number(checkDiscountType(row_content.amount,row_content).interest_amount)
+                    all_data_with_tax.interested_amount += Number(checkDiscountType(row_content.amount,
+                        row_content).interest_amount)
 
                 }
 
-                if(row_content.tax_amount !== undefined)
-                {
+                if (row_content.tax_amount !== undefined) {
                     all_data_with_tax.taxes += row_content.tax_amount
                 }
 
-                {{--row_content.account_id = '{{\App\Account::query()->where('name', 'like', 'Purchases')->first()->id ?? 0}}'--}}
+                {{-- row_content.account_id = '{{\App\Account::query()->where('name', 'like', 'Purchases')->first()->id ?? 0}}' --}}
             })
 
             $('#tbody').html(main_dom)
@@ -646,12 +645,13 @@
 
             // $('#all_tax').val(all_data_with_tax.taxes)
 
-            let net_total = ((all_data_with_tax.sub_total - all_data_with_tax.discounted_amount) + (all_data_with_tax.taxes + all_data_with_tax.interested_amount))
+            let net_total = ((all_data_with_tax.sub_total - all_data_with_tax.discounted_amount) + (
+                all_data_with_tax.taxes + all_data_with_tax.interested_amount))
 
             $('#all_net').val(parseFloat(net_total).toFixed(2))
 
             //delete a row from a quotation table list
-            $('.del_row').click(function(){
+            $('.del_row').click(function() {
 
                 let selected_row_id = $(this).attr('title')
 
@@ -671,7 +671,7 @@
 
                 let findProduct = fetched_products.find(x => String(x.id) === selected_product_id);
 
-                if(findProduct === undefined) {
+                if (findProduct === undefined) {
                     let new_prod = {
                         'currency_id': 1,
                         'description': selected_product_id,
@@ -704,7 +704,8 @@
 
                 // let selected_product_id = $(this).children("option:selected").val();
 
-                let selected_tax_ids = $(this).children("option:selected").toArray().map(item => item.value);
+                let selected_tax_ids = $(this).children("option:selected").toArray().map(item => item
+                    .value);
 
                 let row_id = $(this).attr('title')
 
@@ -720,18 +721,17 @@
 
                 let row_id = $(this).attr('title')
 
-                if($(this).is(':checked'))
-                {
+                if ($(this).is(':checked')) {
                     displayRowItems()
 
                     calculateDiscount(row_id)
 
-                }else{
+                } else {
                     reCalculateDiscount(row_id)
                 }
             })
 
-            $('.input_quantity').on('keyup', function(){
+            $('.input_quantity').on('keyup', function() {
 
                 let input_item_quantity = $(this).val()
 
@@ -747,7 +747,7 @@
 
             })
 
-            $('.input_quantity').on('change', function(){
+            $('.input_quantity').on('change', function() {
 
                 let input_item_quantity = $(this).val()
 
@@ -762,17 +762,16 @@
 
             })
 
-            $('.item_unit_price').keyup(function(){
+            $('.item_unit_price').keyup(function() {
 
                 let item_unit_price = $(this).val(),
                     item_id = $(this).attr('id');
 
-                if(Number(item_unit_price) === 0)
-                {
+                if (Number(item_unit_price) === 0) {
                     initErrorAlert('Unit Price can\'t be 0')
 
-                }else{
-                    let regexpInt =/^\d+$/;
+                } else {
+                    let regexpInt = /^\d+$/;
                     let regexpFloat = /^\d+\.\d{0,2}$/;
                     // if ( !(regexpInt.test($(this).val().toString()) || regexpFloat.test($(this).val().toString())) ){
                     //     $(this).val($(this).val().toString().slice(0,-1));
@@ -794,7 +793,7 @@
 
             })
 
-            $('.discount_interest_value').blur(function(){
+            $('.discount_interest_value').blur(function() {
 
                 let value = $(this).val();
                 let row_id = $(this).attr('title');
@@ -803,9 +802,10 @@
 
                 discount_interest_value.value = value
 
-                let current_row_content = product_rows.find(row_data => row_data.row_id === Number(row_id))
+                let current_row_content = product_rows.find(row_data => row_data.row_id === Number(
+                    row_id))
 
-                if (current_row_content.apply_row_discount){
+                if (current_row_content.apply_row_discount) {
                     calculateDiscount(row_id)
                 }
                 displayRowItems()
@@ -821,9 +821,10 @@
 
                 discount_interest.type = type
 
-                let current_row_content = product_rows.find(row_data => row_data.row_id === Number(row_id))
+                let current_row_content = product_rows.find(row_data => row_data.row_id === Number(
+                    row_id))
 
-                if (current_row_content.apply_row_discount){
+                if (current_row_content.apply_row_discount) {
                     calculateDiscount(row_id)
                 }
                 displayRowItems()
@@ -839,15 +840,16 @@
 
                 discount_interest_type.type = type
 
-                let current_row_content = product_rows.find(row_data => row_data.row_id === Number(row_id))
+                let current_row_content = product_rows.find(row_data => row_data.row_id === Number(
+                    row_id))
 
-                if (current_row_content.apply_row_discount){
+                if (current_row_content.apply_row_discount) {
                     calculateDiscount(row_id)
                 }
                 displayRowItems()
             });
 
-            $('.description').keyup(function(){
+            $('.description').keyup(function() {
 
                 input_description.description = $(this).val()
 
@@ -857,17 +859,14 @@
         }
 
 
-        function MarkTaxesAsChecked(selected_tax_ids_from_grid, current_row_content)
-        {
+        function MarkTaxesAsChecked(selected_tax_ids_from_grid, current_row_content) {
             tax_options = ``
 
             let selected_tax_name = []
-            $.each(fetched_taxes, function (i, tax) {
+            $.each(fetched_taxes, function(i, tax) {
 
-                $.each(selected_tax_ids_from_grid, function(x, selected_tax_id)
-                {
-                    if(tax.id === Number(selected_tax_id))
-                    {
+                $.each(selected_tax_ids_from_grid, function(x, selected_tax_id) {
+                    if (tax.id === Number(selected_tax_id)) {
                         console.log(tax, selected_tax_id)
 
                         selected_tax_name.push(tax.name)
@@ -877,10 +876,9 @@
                 })
             })
 
-            $.each(fetched_taxes, function (i, tax) {
+            $.each(fetched_taxes, function(i, tax) {
 
-                if(!selected_tax_name.some(tax_name => tax_name === tax.name))
-                {
+                if (!selected_tax_name.some(tax_name => tax_name === tax.name)) {
                     // console.log(tax)
                     tax_options += `<option value="${tax.id}">${tax.name}</option>`
                 }
@@ -890,8 +888,7 @@
         }
 
 
-        function populateFormRow(row_id, selected_product_id_from_grid)
-        {
+        function populateFormRow(row_id, selected_product_id_from_grid) {
 
             let product_id = selected_product_id_from_grid.split(',')[0]
 
@@ -906,7 +903,7 @@
             let current_row_content = product_rows.find(row_data => row_data.row_id === Number(row_id))
 
             //set subtotal for the row content
-            current_row_content.amount = product.car_cost !== null ? product.car_cost : 1
+            current_row_content.amount = product.unit_cost !== null ? product.unit_cost : 1
 
             // current_row_content.amount = product.sub_total
             // current_row_content.total = product.sub_total
@@ -914,10 +911,10 @@
             //set input quantity for the row content
             current_row_content.quantity = 1
 
-            current_row_content.description = product.model+' ('+product.car_number+')'
+            current_row_content.description = product.name
 
             // current_row_content.unit_price = product.price
-            current_row_content.unit_price = product.car_cost !== null ? product.car_cost : 1
+            current_row_content.unit_price = product.unit_cost !== null ? product.unit_cost : 1
 
             current_row_content.selected_product_id = product.id
 
@@ -929,15 +926,13 @@
 
             current_row_content.selected_tax_ids_from_grid = []
 
-            current_row_content.total = product.car_cost !== null ? product.car_cost : 1
+            current_row_content.total = product.unit_cost !== null ? product.unit_cost : 1
 
             displayRowItems()
         }
 
-        function gridSkeleton(row_data)
-        {
-            if(Number(row_data.row_id) === Number(input_description.row_id))
-            {
+        function gridSkeleton(row_data) {
+            if (Number(row_data.row_id) === Number(input_description.row_id)) {
                 row_data.description = input_description.description
 
                 input_description.row_id = 0
@@ -945,8 +940,7 @@
                 input_description.description = ''
             }
 
-            if(Number(row_data.row_id) === Number(input_price.row_id))
-            {
+            if (Number(row_data.row_id) === Number(input_price.row_id)) {
                 row_data.unit_price = input_price.unit_price
 
                 input_price.unit_price = 0
@@ -954,13 +948,11 @@
                 input_price.row_id = 0
 
                 row_data.amount = row_data.unit_price * row_data.quantity
-            }
-            else{
+            } else {
                 row_data.amount = row_data.unit_price * row_data.quantity
             }
 
-            if(Number(row_data.row_id) === Number(discount_interest_value.row_id))
-            {
+            if (Number(row_data.row_id) === Number(discount_interest_value.row_id)) {
                 row_data.discount_interest_value_ = discount_interest_value.value
 
                 discount_interest_value.value = 0
@@ -970,33 +962,33 @@
             }
 
 
-            if(Number(row_data.row_id) === Number(discount_interest.row_id))
-            {
+            if (Number(row_data.row_id) === Number(discount_interest.row_id)) {
                 row_data.discount_interest_ = discount_interest.type
 
-                row_data.discount_options= setDiscountOptions(discount_interest.type)
+                row_data.discount_options = setDiscountOptions(discount_interest.type)
 
                 discount_interest.type = ''
 
                 discount_interest.row_id = 0
             }
 
-            if(Number(row_data.row_id) === Number(discount_interest_type.row_id))
-            {
+            if (Number(row_data.row_id) === Number(discount_interest_type.row_id)) {
                 row_data.discount_interest_type_ = discount_interest_type.type
 
-                row_data.discount_types= setDiscountTypes(discount_interest_type.type)
+                row_data.discount_types = setDiscountTypes(discount_interest_type.type)
 
                 discount_interest_type.type = ''
 
                 discount_interest_type.row_id = 0
             }
 
-            let description = row_data.description === '' || row_data.description === null ? `` : row_data.description;
+            let description = row_data.description === '' || row_data.description === null ? `` : row_data
+                .description;
 
             let unit_price = row_data.unit_price === '' ? `` : row_data.unit_price;
 
-            let discount_value = row_data.discount_interest_value_ === '' ? `` : row_data.discount_interest_value_;
+            let discount_value = row_data.discount_interest_value_ === '' ? `` : row_data
+                .discount_interest_value_;
 
             let subtotal = row_data.amount === '' ? `` : row_data.amount;
 
@@ -1006,13 +998,13 @@
 
             let row_discount = ``
 
-            if(row_data.item_type === 'service')
-            {
-                quantity = `<input type="text" id="item_unit_quantity_${row_data.row_id}" style="min-width:110px" value="1" readonly name="quantity" class="form-control input_quantity" autofocus>`
+            if (row_data.item_type === 'service') {
+                quantity =
+                    `<input type="text" id="item_unit_quantity_${row_data.row_id}" style="min-width:110px" value="1" readonly name="quantity" class="form-control input_quantity" autofocus>`
 
-            }
-            else{
-                quantity = `<input type="number" id="item_unit_quantity_${row_data.row_id}" style="min-width:110px" title="${row_data.row_id},${item_type}"  value="${row_data.quantity}" min="1" class="form-control input_quantity">`
+            } else {
+                quantity =
+                    `<input type="number" id="item_unit_quantity_${row_data.row_id}" style="min-width:110px" title="${row_data.row_id},${item_type}"  value="${row_data.quantity}" min="1" class="form-control input_quantity">`
             }
 
             return `<tr>
@@ -1041,7 +1033,9 @@
         }
 
         // on save: retrieve grid and submit
-        $('#formInvoice').submit(function (e){
+        $('#formInvoice').submit(function(e) {
+        
+            
             e.preventDefault();
             let vendor_id = $('#vendor_id').val()
             let invoice_number_type = $('#invoice_number_type option:selected').val();
@@ -1058,7 +1052,9 @@
             let vat_total = $('#vat_total').val();
             let covid_total = $('#covid_total').val();
             let vat_flat_total = $('#vat_flat_total').val();
-            let maintenance_id = '{{request()->segment(count(request()->segments()))}}';
+            let maintenance_id = '{{ request()->segment(count(request()->segments())) }}';
+
+            let invoice_type = 'maintenance';
 
             let data = {
                 vendor_id,
@@ -1077,7 +1073,8 @@
                 covid_total,
                 vat_flat_total,
                 product_rows,
-                maintenance_id
+                maintenance_id,
+                invoice_type
             }
 
             if (invoice_number_type === 'manual' && invoice_number === '') {
@@ -1094,41 +1091,43 @@
 
             waitme('formInvoice');
             $.ajax({
-                url: '{{ route('finance.invoice.store') }}',
+                url: '{{ route('finance.invoice.store.new') }}',
                 method: 'POST',
-                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 data_type: 'json',
                 data,
             }).done((response) => {
-                console.log('This is the ajax response', response)
+                console.log('This is the ajax response ---', response)
                 hidewaitme('formInvoice')
                 if (response.message === 'success') {
+ 
+                    window.location = '{{ route('mechanic.garage') }}'
 
-                    window.location = '{{route('mechanic.garage')}}'
-
-                }
-                else {
-
+                } else {
+                    console.log('This is the ajax response error', response)
                     let errors = `${response.message}`
 
-                    if(errors === 'Invoice Items can\'t be empty. Please select one or more line items')
-                    {
+                    console.log('wilson-new error', errors);
+
+
+                    if (errors ===
+                        'Invoice Items can\'t be empty. Please select one or more line items') {
                         $('#errorMsg').html(errors)
 
-                    }
-                    else if(errors === 'error'){
+                    } else if (errors === 'error') {
                         $('#errorMsg').html('Whoops! Something went wrong')
 
-                    }else {
+                    } else {
 
                         let error_dom = ``
 
-                        if(typeof(response.errors) === 'string')
-                        {
+                        if (typeof(response.errors) === 'string') {
                             error_dom += `${error}<br>`
-                        }else{
+                        } else {
 
-                            $.each(response.errors, (i, error)=> {
+                            $.each(response.errors, (i, error) => {
 
                                 error = error.replace('[', '')
                                 error = error.replace(']', '')
@@ -1146,5 +1145,4 @@
             })
         })
     })
-
 </script>

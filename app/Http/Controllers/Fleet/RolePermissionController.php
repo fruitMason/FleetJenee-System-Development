@@ -168,7 +168,7 @@ class RolePermissionController extends Controller
 
                     'Finance Requests >>',
                     ' General Requests',
-                    ' Parts Purchase Request',
+                    // ' Parts Purchase Request',
 
                     'Auto Parts Store >>',
                     ' Parts Inventory',
@@ -314,7 +314,7 @@ class RolePermissionController extends Controller
 
                 'Finance Requests >>',
                 ' General Requests',
-                ' Parts Purchase Request',
+                // ' Parts Purchase Request',
 
                 'Auto Parts Store >>',
                 ' Parts Inventory',

@@ -119,7 +119,7 @@
                     <h1 class="section-title">PURCHASE ORDER</h1>
                 </td>
                 <td class="text-right"><img class="img-fluid" alt="Logo"
-                        src="{{ public_path('assets/img/omni_bank.png') }}"></td>
+                        src="{{ public_path('assets/img/fleetjeneelogo.jpg') }}" width="200"></td>
             </tr>
         </table>
     </div>
@@ -223,7 +223,7 @@
                     <h1 class="section-title">WORK ORDER</h1>
                 </td>
                 <td class="text-right"><img class="img-fluid" alt="Logo"
-                        src="{{ asset('assets/img/omni_bank.png') }}"></td>
+                        src="{{ asset('assets/img/fleetjeneelogo.jpg') }}" width="200"></td>
             </tr>
         </table>
     </div>
@@ -232,7 +232,7 @@
     <div class="col-md-12">
         <table>
             <tr>
-                <td> 
+                <td>
                     <b>TO</b>:<br>
                     {{-- {{ $data->maintenance->mechanic->full_name() ?? ' NA' }}<br>
                     {{ $data->maintenance->mechanic->email }}<br>

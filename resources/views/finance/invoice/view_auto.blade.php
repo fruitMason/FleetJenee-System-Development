@@ -143,7 +143,7 @@
                             <table class="w-100 mb-4">
                                 <tr>
                                     <td class="w-80">
-                                        <img class="img-fluid" alt="AVATAR" src="{{ asset('assets/img/omni_bank.png') }}">
+                                        <img class="img-fluid" alt="AVATAR" src="{{ asset('assets/img/fleetjeneelogo.jpg') }}" width="200">
                                     </td>
                                     <td class="w-20 text-right">
                                         <h1 class="section-title">PURCHASE ORDER</h1>
@@ -256,7 +256,7 @@
                                 <tr>
                                     <td class="w-80">
                                         <img class="img-fluid" alt="AVATAR"
-                                            src="{{ asset('assets/img/omni_bank.png') }}">
+                                            src="{{ asset('assets/img/fleetjeneelogo.jpg') }}" width="200">
                                     </td>
                                     <td class="w-20 text-right">
                                         <h1 class="section-title">WORK ORDER</h1>

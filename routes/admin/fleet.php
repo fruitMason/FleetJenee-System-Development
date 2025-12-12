@@ -216,7 +216,7 @@ Route::prefix('finance')->middleware('fleetManagerOnly')->group(function () {
         Route::get('index', [FinanceController::class, 'showInvoice'])->name('finance.invoice.index');
         Route::get('create', [FinanceController::class, 'showCreateInvoice'])->name('finance.invoice.create');
         ///Route::get('get-orders-by-vendor', [FinanceController::class, 'workOrderByVendor'])->name('finance.invoice.orders.by.vendor');
-        Route::post('store', [FinanceController::class, 'storeInvoice'])->name('finance.invoice.store');
+        Route::post('store', [FinanceController::class, 'storeInvoice'])->name('finance.invoice.store');       
         Route::delete('destroy/{invoice}', [FinanceController::class, 'destroyInvoice'])->name('finance.invoice.destroy');
         Route::post('status/update', [FinanceController::class, 'updateStatus'])->name('finance.invoice.status.update');
         Route::post('status/tofinance', [FinanceController::class, 'submitToFinance'])->name('finance.invoice.submittofinance');

@@ -143,7 +143,8 @@
                             <table class="w-100 mb-4">
                                 <tr>
                                     <td class="w-80">
-                                        <img class="img-fluid" alt="AVATAR" src="{{ asset('assets/img/omni_bank.png') }}">
+                                        <img class="img-fluid" alt="AVATAR"
+                                            src="{{ asset('assets/img/fleetjeneelogo.jpg') }}" width="200">
                                     </td>
                                     <td class="w-20 text-right">
                                         <h1 class="section-title">PURCHASE ORDER</h1>
@@ -252,74 +253,80 @@
                                 </div>
                             </div>
 
-                            <table class="w-100 mb-4">
-                                <tr>
-                                    <td class="w-80">
-                                        <img class="img-fluid" alt="AVATAR"
-                                            src="{{ asset('assets/img/omni_bank.png') }}">
-                                    </td>
-                                    <td class="w-20 text-right">
-                                        <h1 class="section-title">WORK ORDER</h1>
-                                    </td>
-                                </tr>
-                            </table>
-
-
-
-                            <div class="mb-4">
-                                <table class="w-100">
+                            <!--work order start--->
+                            @if ($work_data)
+                                <table class="w-100 mb-4">
                                     <tr>
-                                        <td>
-                                            <b>TO</b>:<br>
-                                            {{ $work_data->mechanic ? $work_data->mechanic->full_name() : 'N/A' }}<br>
-                                            {{ $work_data->mechanic ? $work_data->mechanic->email : 'N/A' }}<br>
-                                            {{ $work_data->mechanic ? $work_data->mechanic->mobile : 'N/A' }}<br>
-                                            {{-- {{ $work_data->mechanic && $data->maintenance->mechanic->department && $data->maintenance->mechanic->department->region ? $data->maintenance->mechanic->department->region->name : 'N/A' }} --}}
-
-                                            <br>
+                                        <td class="w-80">
+                                            <img class="img-fluid" alt="AVATAR"
+                                                src="{{ asset('assets/img/fleetjeneelogo.jpg') }}" width="200">
+                                        </td>
+                                        <td class="w-20 text-right">
+                                            <h1 class="section-title">WORK ORDER</h1>
                                         </td>
                                     </tr>
                                 </table>
-                            </div>
 
-                            <hr>
-                            <h3>Order detail</h3>
 
-                            <div class="row">
+
+                                @if ($work_data->mechanic)
+                                    <div class="mb-4">
+                                        <table class="w-100">
+                                            <tr>
+                                                <td>
+                                                    <b>TO</b>:<br>
+                                                    {{ $work_data->mechanic ? $work_data->mechanic->full_name() : 'N/A' }}<br>
+                                                    {{ $work_data->mechanic ? $work_data->mechanic->email : 'N/A' }}<br>
+                                                    {{ $work_data->mechanic ? $work_data->mechanic->mobile : 'N/A' }}<br>
+                                                    {{-- {{ $work_data->mechanic && $data->maintenance->mechanic->department && $data->maintenance->mechanic->department->region ? $data->maintenance->mechanic->department->region->name : 'N/A' }} --}}
+
+                                                    <br>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                @endif
+
+                                <hr>
+                                <h3>Order detail</h3>
+
+                                <div class="row">
+                                    <div class="row mb-4">
+                                        <div class="col-md-6">
+                                            <div class="title"><strong>Car:</strong></div>
+                                            <div class="text">{{ $work_data->car->model ?? 'N/A' }}
+                                                ({{ $work_data->car->car_number ?? 'N/A' }}) </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div><strong>Maintenance Type:</strong></div>
+                                            <div>{{ $work_data->type ?? 'N/A' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
                                 <div class="row mb-4">
                                     <div class="col-md-6">
-                                        <div class="title"><strong>Car:</strong></div>
-                                        <div class="text">{{ $work_data->car->model ?? 'N/A' }}
-                                            ({{ $work_data->car->car_number ?? 'N/A' }}) </div>
+                                        <div> <strong>Start Date:</strong> </div>
+                                        <div>
+                                            {{ $work_data->start_date ? $work_data->start_date->format('D, d F Y H:i A') : 'N/A' }}
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div><strong>Maintenance Type:</strong></div>
-                                        <div>{{ $work_data->type ?? 'N/A' }}</div>
+                                        <div><strong>End Date:</strong></div>
+                                        <div>
+                                            {{ $work_data->end_date ? $work_data->end_date->format('D, d F Y H:i A') : 'N/A' }}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div> <strong>Start Date:</strong> </div>
-                                    <div>
-                                        {{ $work_data->start_date ? $work_data->start_date->format('D, d F Y H:i A') : 'N/A' }}
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <div><strong>Comments:</strong></div>
+                                        <div>{{ $work_data->comment ?? 'N/A' }}</div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div><strong>End Date:</strong></div>
-                                    <div>
-                                        {{ $work_data->end_date ? $work_data->end_date->format('D, d F Y H:i A') : 'N/A' }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-md-12">
-                                    <div><strong>Comments:</strong></div>
-                                    <div>{{ $work_data->comment ?? 'N/A' }}</div>
-                                </div>
-                            </div>
+                            @endif
+                            <!--//work order ending-->
 
                             <hr>
                             <div class="mb-4">
