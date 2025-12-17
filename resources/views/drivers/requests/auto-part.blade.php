@@ -19,10 +19,16 @@
                             <li class="breadcrumb-item active">Car Requests</li>
                         </ul>
                     </div>
-                    <div class="col-auto float-end ms-auto">
-                        <a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#request_car_modal"><i
-                                class="fa fa-plus"></i> Request New</a>
-                    </div>
+                    @if (auth()->user()->hasCar())
+                        <div class="col-auto float-end ms-auto">
+                            <a href="#" class="btn add-btn" data-bs-toggle="modal"
+                                data-bs-target="#request_car_modal"><i class="fa fa-plus"></i> Request New</a>
+                        </div>
+                    @else
+                        <div class="col-auto float-end ms-auto">
+                            <p class="text-warning">No Car Assigned At The Moment!</p>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -36,7 +42,9 @@
             </div>
         </div>
 
-        @include('modal.driver.request_auto')
+        @if (auth()->user()->hasCar())
+            @include('modal.driver.request_auto')
+        @endif
     </div>
 
 @endsection

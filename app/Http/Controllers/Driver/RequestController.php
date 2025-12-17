@@ -133,6 +133,7 @@ class RequestController extends Controller
 
     public function approve(Request $request)
     {
+
         //return $request;
         $validator = Validator::make($request->all(), [
             'approve_car_request_id' => 'required',
@@ -144,7 +145,7 @@ class RequestController extends Controller
         ]);
 
 
-        if (CarRequest::where('user_id', $request->user_id)->where('trip_status', '!=', 'ended')->exists()) {
+        if (CarRequest::where('user_id', $request->user_id)->where('trip_status', '!=', 'ended')->where('status', 'approved')->exists()) {
             return Redirect::back()->withErrors(['error' => 'Selected user already has an unended trip!']);
         }
 
@@ -160,14 +161,6 @@ class RequestController extends Controller
             return back()->withErrors(['error' => 'Car request not found.']);
         }
 
-        // Update the car request status to approved
-        $carRequest->status = $data['status'];
-        $carRequest->auth_by = $request->user()->id;
-        $carRequest->auth_comment = $data['comment'];
-        $carRequest->car_id = $data['car_id'];
-        $carRequest->user_id = $data['user_id'];
-        $carRequest->save();
-
         // Fetch the requested car ensuring it's a pool car
         $car = Car::query()
             ->where('car_group', 'pool') // Ensure filtering for pool cars
@@ -180,7 +173,17 @@ class RequestController extends Controller
         }
 
         // Update the car's user ID
-        $car->update(['user_id' => $request->user_id]);
+        $car->update(['user_id' => $request->user_id, 'car_group' => 'assigned']);
+
+        // Update the car request status to approved
+        $carRequest->status = $data['status'];
+        $carRequest->auth_by = $request->user()->id;
+        $carRequest->auth_comment = $data['comment'];
+        $carRequest->car_id = $data['car_id'];
+        $carRequest->user_id = $data['approve_car_user_id'];
+        $carRequest->save();
+
+
 
         // Prepare the notification message
         $message = 'Congratulations, your car request has been approved and ' . $car->model . ' (' . $car->car_number . ') has been assigned to you. Thank you!';

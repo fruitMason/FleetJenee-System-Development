@@ -32,7 +32,10 @@ class MyCarRequestsDataTable extends DataTable
                 return Carbon::parse($row->date_needed)->format('D, d F Y');
             })
             ->addColumn('car', function ($row) {
-                return '';//$row->car->car_features();
+                if (strtolower($row->status) == 'approved')
+                    return $row->car->car_features();
+                else
+                    return '';
             })
             ->addColumn('return_date', function ($row) {
                 return Carbon::parse($row->return_date)->format('D, d F Y');
@@ -57,6 +60,9 @@ class MyCarRequestsDataTable extends DataTable
 
             ->addColumn('action', function ($row) {
                 if ($row->status == 'pending') {
+                    if (Gate::allows('is-driver')) {
+                        return '';
+                    }
                     return '<div class="dropdown dropdown-action">' .
                         '<a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>' .
                         '<div class="dropdown-menu dropdown-menu-right">' .

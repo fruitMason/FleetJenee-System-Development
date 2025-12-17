@@ -34,10 +34,17 @@ class CarRequestDataTable extends DataTable
                 return Carbon::parse($row->return_date)->format('D, d F Y');
             })
             ->editColumn('user_id', function ($row) {
+               
                 return !is_null($row->user) ? $row->user->full_name() . ' (' . $row->user->getRole() . ')' : 'N/A';
             })
-            ->addColumn('car_group', function ($row) {
-                return !is_null($row->user) ? 'Non Pool' : 'Pool';
+            ->addColumn('car_assigned', function ($row) {
+                 if (strtolower($row->status) == 'pending')
+                {
+                    return 'Not Yet Assigned!';
+                }else{
+                    return  $row->car->car_features() ;
+                }
+               
             })
             ->editColumn('status', function ($row) {
                 if (strtolower($row->status) == 'pending')
@@ -79,7 +86,7 @@ class CarRequestDataTable extends DataTable
         $user_id = $this->request()->get('user_id') != '-- Select User --' && $this->request()->get('user_id') != null ? ['user_id' => $this->request()->get('user_id')] : [];
         $status   = $this->request()->get('status') != '-- Select Status --' && $this->request()->get('status') != null ? ['status' => $this->request()->get('status')] : [];
         $user = $this->user_id != null ? ['user_id' => $this->user_id] : [];
-        $query = CarRequest::query()->with(['user'])->orderByDesc('created_at')->where($user_id)->where($user)->where($status);
+        $query = CarRequest::query()->with(['user','car'])->orderByDesc('created_at')->where($user_id)->where($user)->where($status);
         if ($this->request()->get('car_group') == 'pool') {
             $query->whereNull('user_id');
         } elseif ($this->request()->get('car_group') == 'non_pool') {
@@ -143,7 +150,7 @@ class CarRequestDataTable extends DataTable
             Column::make('return_date')->title('Return&nbsp;Date')->addClass('text-center no-border'),
             Column::make('user_id')->title('Assigned&nbsp;User')->addClass('text-center no-border'),
             Column::make('request_reason')->title('Request&nbsp;Purpose')->addClass('text-center no-border'),
-            Column::computed('car_group')->title('Car Group')->addClass('text-center no-border'),
+            Column::computed('car_assigned')->title('Car Assigned')->addClass('text-center no-border'),
             Column::computed('status')->addClass('text-center no-border'),
             Column::computed('action')->addClass('text-center no-border')
         ];

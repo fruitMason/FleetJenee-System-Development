@@ -134,9 +134,14 @@
                         </ul>
                     </div>
 
-                    @if(auth()->user()->hasCar())
+                    @if (auth()->user()->hasCar())
                         <div class="col-auto float-end ms-auto">
-                            <a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#add_elog_modal"><i class="fa fa-plus"></i> Add New</a>
+                            <a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#add_elog_modal"><i
+                                    class="fa fa-plus"></i> Add New</a>
+                        </div>
+                    @else
+                        <div class="col-auto float-end ms-auto">
+                            <p class="text-warning">No Car Assigned At The Moment!</p>
                         </div>
                     @endif
                 </div>
@@ -151,7 +156,7 @@
             </div>
         </div>
 
-        @if(auth()->user()->hasCar())
+        @if (auth()->user()->hasCar())
             @include('modal.driver.add_elog')
             @include('modal.driver.end_trip')
         @endif
@@ -166,12 +171,11 @@
     <script src="{{ asset('assets/js/dataTables.bootstrap4.min.js') }}"></script>
 
     <script>
-
-        function updateELogNotify(id){
-            ajax('{{route('driver.report.elog.get')}}', {
+        function updateELogNotify(id) {
+            ajax('{{ route('driver.report.elog.get') }}', {
                 id: id,
                 _token: _token
-            }, 'card_content', function (response) {
+            }, 'card_content', function(response) {
                 let data = response.message;
                 $('#edit_modal .modal-title').html('Updating ELog: ' + data.title);
                 $('#edit_id').val(data.id);
@@ -186,13 +190,13 @@
             $('#end_trip_id').val(id);
             $('#end_trip_modal').modal('show');
         }
-            
+
         function submitEndTrip() {
             const id = $('#end_trip_id').val();
             const endOdometer = $('#end_odometer').val();
 
             $.ajax({
-                url: '{{ route("driver.report.elog.end_trip") }}',
+                url: '{{ route('driver.report.elog.end_trip') }}',
                 type: 'POST',
                 data: {
                     id: id,

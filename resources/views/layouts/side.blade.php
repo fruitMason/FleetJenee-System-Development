@@ -314,7 +314,7 @@
                     </li>
                 @endcan
 
-                @if (auth()->user()->hasCar())
+                {{-- @if (auth()->user()->hasCar()) --}}
                     @can('Odometer Manager')
                         <li class="@if (str_contains(url()->current(), '/driver/odometer')) active @endif">
                             <a href="{{ route('driver.odometer') }}"><i class="fa fa-tachometer"></i> <span>Odometer
@@ -345,7 +345,8 @@
                                 <span>Auto Part Requests</span></a>
                         </li>
                     @endcan
-                @endcan
+                {{-- @endcan --}}
+
                 @php
                     $drivertype = Auth::user()->driver_type;
                 @endphp
