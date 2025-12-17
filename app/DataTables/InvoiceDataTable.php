@@ -115,8 +115,8 @@ class InvoiceDataTable extends DataTable
                 method_field('DELETE') .
 
                 '<button type="submit"  style="width:100%;color:black;align:right;" class="btn btn-danger" onclick="archiveNotify(' . $row->id . ')">
-                            <i class="fa fa-trash text-white" aria-hidden="true"> Delete</i>'.
-                            
+                            <i class="fa fa-trash text-white" aria-hidden="true"> Delete</i>' .
+
                 '</button>' .
                 '</form></a>' .
 
@@ -161,15 +161,18 @@ class InvoiceDataTable extends DataTable
         $from = $this->request()->filled('from') ? Carbon::createFromFormat('d/m/Y', $this->request()->get('from'))->toDateString() : Carbon::now()->startOfYear();
         $to = $this->request()->filled('to') ? Carbon::createFromFormat('d/m/Y', $this->request()->get('to'))->toDateString() : Carbon::now()->endOfYear();
         $date = [$from . ' 00:00:00', $to . ' 23:59:59'];
-
+        $status_raw = $this->request()->get('status');
         $status = $this->request()->get('status') != '-- Select Status --' && $this->request()->get('status') != null ? ['status' => $this->request()->get('status')] : [];
         Log::info($date);
         Log::info($status);
         $status =  $status == [] ? ['status' => 'pending'] : $status;
         Log::info('status');
-        Log::info($status);
-        $query = Invoice::query()->with(['vendor', 'invoiceItem'])->whereBetween('created_at', $date)->where($status)->orderByDesc('created_at');
+        Log::info($status_raw);
 
+        $query = Invoice::query()->with(['vendor', 'invoiceItem'])->whereBetween('created_at', $date)->where($status)->orderByDesc('created_at');
+        if ($status_raw == 'all') {
+            $query = Invoice::query()->with(['vendor', 'invoiceItem'])->whereBetween('created_at', $date)->orderByDesc('created_at');
+        }
         return $this->applyScopes($query);
     }
 

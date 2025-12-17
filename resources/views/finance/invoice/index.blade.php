@@ -49,6 +49,7 @@
                     <div class="form-group form-focus select-focus">
                         <select class="select floating" id="status">
                             <option>-- Select Status --</option>
+                            <option value="all">All</option>
                             <option value="pending">Pending</option>
                             <option value="paid">Paid</option>
                             <option value="partially_paid">Partially Paid</option>
