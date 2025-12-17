@@ -53,6 +53,7 @@ class DriverManagerController extends Controller
         $odometerLevel = $car->odometer_level;
 
         // Check if odometer value exceeds 10,000
+        // $this->overdueEndtrip($request,$car,$odometerLevel,$create->new_value);
         if ($create->new_value > $odometerLevel) {
             // Send notification to the driver
             Notifications::createNotification(
@@ -179,11 +180,14 @@ class DriverManagerController extends Controller
             'created_at' => now(),
             'user_id' => $request->user()->id
         ]);
-        
-        $carRequest->car->update(['odometer' => $request->odometer, 'user_id' => '0']);
+
+        $carRequest->car->update(['odometer' => $request->odometer, 'user_id' => '0', 'car_group' => 'pool']);
 
         //return car to pool
         //$count_trips = CarRequest::where('user_id',$request)->
+        //check ir exceeds
+        $car = $carRequest->car;
+        $this->overdueEndtrip($request, $car, $car->odometer_level, $create->new_value);
 
 
 
@@ -265,5 +269,44 @@ class DriverManagerController extends Controller
         $data->comment = $comment;
         $data->save();
         return $this->sendSuccessJsonResponse('Waybill Action Successful');
+    }
+
+
+
+    private function overdueEndtrip(Request $request, Car $car, $odometerLevel, $new_Odometer)
+    {
+        // Check if odometer value exceeds 10,000
+        if ($new_Odometer > $odometerLevel) {
+            // Send notification to the driver
+            Notifications::createNotification(
+                $request->user_id,  // Notifying the specific user (driver)
+                'Car Maintenance Status Updated',
+                'The car with number ' . $car->car_number . ' has exceeded ' . number_format($odometerLevel) . ' km. Current value is ' . number_format($new_Odometer) . 'km. Please schedule maintenance.'
+            );
+
+            Notifications::createNotification(
+                '1',  // Notifiy also fleet manager
+                'Car Maintenance Status Updated',
+                'The car with number ' . $car->car_number . ' has exceeded ' . number_format($odometerLevel) . ' km. Current value is ' . number_format($new_Odometer) . 'km. Please schedule maintenance.'
+            );
+
+
+
+
+            $message = 'The car with number ' . $car->car_number . ' has exceeded ' . number_format($odometerLevel)  . ' km. Current value is ' . number_format($new_Odometer) . ' km. Please schedule maintenance.';
+            $naloMes = str_replace(' ', '+', $message);
+            $mobile = User::find(1)->mobile;
+
+            if ($car->odometer_status == 'Active') {
+                try {
+                    $SMSStatus =    "SMS Send To " . $mobile;
+                    GlobalValueCore::SendSMS_ViaHubtelAPI($mobile, $naloMes);
+                } catch (\Exception $e) {
+                    $SMSStatus = $SMSStatus . "|| sms not sent : " . $e->getMessage();
+                    Log::error('sms-error' . $e->getMessage());
+                }
+            }
+            $car->update(['odometer_status' => 'Overdue']);
+        }
     }
 }

@@ -4,6 +4,8 @@ namespace App\DataTables;
 
 use App\Models\AccidentReport;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
@@ -63,12 +65,16 @@ class DriverAccidentReportDataTable extends DataTable
      */
     public function query()
     {
-        $query = auth()->user()->can('fleet_management')
+        $query = //auth()->user()->can('fleet_management')
+        Auth::user()->hasRole('FLEET MANAGER')
             ? AccidentReport::with(['media', 'car', 'user'])->orderByDesc('created_at')
             : AccidentReport::with(['media', 'car'])->whereBelongsTo(auth()->user())->orderByDesc('created_at');
-
+            
+            Log::info(Auth::user()->hasRole('FLEET MANAGER'));
+            Log::info('ac-repo');
+     
         return $this->applyScopes($query);
-    }
+    } 
 
     /**
      * Optional method if you want to use html builder.

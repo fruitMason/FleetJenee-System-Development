@@ -8,6 +8,8 @@ use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MyCarRequestsDataTable extends DataTable
 {
@@ -97,9 +99,26 @@ class MyCarRequestsDataTable extends DataTable
     /**
      * Get query source of dataTable.
      */
-    public function query()
+    public function query(Request $request)
     {
-        $query = CarRequest::query()->whereBelongsTo(auth()->user())->orderByDesc('created_at');
+        $status = $request->input('filter');
+        Log::info('request_status : ' . $status);
+        $trip_status = 'pending';
+
+
+        if ($request->input('filter')) {
+            $trip_status =  $status;
+            $query =   CarRequest::query()->whereBelongsTo(auth()->user())->where('status', 'approved')
+                ->where('trip_status', $trip_status)->orderByDesc('created_at');
+        } else {
+            $query =     CarRequest::query()->whereBelongsTo(auth()->user())->where('status', 'approved')
+            ->whereIn('trip_status', ['pending', 'started'])
+                ->orderByDesc('created_at');
+        }
+
+
+
+
         return $this->applyScopes($query);
     }
 

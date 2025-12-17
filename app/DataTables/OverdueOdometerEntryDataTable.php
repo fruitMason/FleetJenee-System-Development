@@ -3,6 +3,8 @@
 namespace App\DataTables;
 
 use App\Models\Car;
+use App\Models\OdometerHistory;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
@@ -11,10 +13,15 @@ class OverdueOdometerEntryDataTable extends DataTable
 {
     public function dataTable($query)
     {
+
+
         $dataTable = datatables()
             ->eloquent($query)
             ->addColumn('created_at', function ($row) {
-                return $row->latestOdometerHistory->created_at->format('d/m/y H:i:s A');
+                return optional($row->latestOdometer)
+                    ->created_at?->format('d/m/Y h:i:s A') ?? 'N/A';
+                // $odo = OdometerHistory::where('car_id',$row->id)->orderBy('created_at','desc')->first();
+                // return $odo->created_at->format('d/m/yy H:i:s A');// $row->latestOdometerHistory->created_at->format('d/m/y H:i:s A');
             })
             ->addColumn('car_model', function ($row) {
                 return $row->model ?? 'N/A';
@@ -23,31 +30,34 @@ class OverdueOdometerEntryDataTable extends DataTable
                 return $row->car_number ?? 'N/A';
             })
             ->addColumn('zone', function ($row) {
-                return $row->user->department->region->sector->name ?? 'N/A';
+                return optional($row->latestOdometer)->user->department->region->sector->name ?? 'N/A';
             })
             ->addColumn('region', function ($row) {
-                return $row->user->department->region-> name ?? 'N/A';
+                return optional($row->latestOdometer)->user->department->region->name ?? 'N/A';
             })
             ->addColumn('assigned_user', function ($row) {
-                return $row->user->full_name() ?? 'N/A';
+                return optional($row->latestOdometer)->user->full_name() ?? 'N/A'; // $row->user->;
             })
             ->addColumn('assigned_user_mobile', function ($row) {
-                return $row->user->mobile ?? 'N/A';
+                return  optional($row->latestOdometer)->user->mobile ?? 'N/A';
             })
             ->addColumn('department', function ($row) {
-                return $row->user->department->name ?? 'N/A';
+                return optional($row->latestOdometer)->user->department->name ?? 'N/A';
             })
             ->addColumn('new_value', function ($row) {
-                return $row->latestOdometerHistory->new_value ?? 'N/A';
+                return optional($row->latestOdometer)
+                    ->new_value ?? 'N/A';
+                return ''; //$row->latestOdometerHistory->new_value ?? 'N/A';
             })
             ->addColumn('action', function ($row) {
+                
                 $showOdometersUrl = route('fleet.vehicle.odometer.history', ['car_id' => $row->id]);
                 return '<div class="dropdown dropdown-action">' .
                     '<a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>' .
                     '<div class="dropdown-menu dropdown-menu-right">' .
-                     '<a class="dropdown-item" href="'. route('fleet.vehicle.odometer.overdue.workorder',$row->id) .'"><i class="fas fa-tools m-r-5"></i>Initiate Maintenance</a>' .
-                    '<a class="dropdown-item" href="tel:'.$row->user->mobile.'"><i class="fa fa-phone m-r-5"></i> Call User</a>' .
-                    '<a class="dropdown-item" href="mailto:'.$row->user->email.'"><i class="fa fa-mail-reply m-r-5"></i> Mail</a>' .
+                    '<a class="dropdown-item" href="' . route('fleet.vehicle.odometer.overdue.workorder', $row->id) . '"><i class="fas fa-tools m-r-5"></i>Initiate Maintenance</a>' .
+                    // '<a class="dropdown-item" href="tel:' . optional($row->latestOdometer)->user->mobile . '"><i class="fa fa-phone m-r-5"></i> Call User</a>' .
+                    // '<a class="dropdown-item" href="mailto:' . optional($row->latestOdometer)->user->email . '"><i class="fa fa-mail-reply m-r-5"></i> Mail</a>' .
                     '</div></div>';
             })
             ->rawColumns(['checkbox', 'status', 'action']);
@@ -57,10 +67,18 @@ class OverdueOdometerEntryDataTable extends DataTable
 
     public function query()
     {
-        $query = Car::query()->whereHas('user')->whereHas('latestOdometerHistory', function ($q) {
-              $q->where('odometer_status','Overdue');
-           // $q->havingRaw('DATEDIFF(now(), max(created_at)) >= 4');
-        });
+        $query = Car::with('latestOdometer')->where('odometer_status', 'Overdue');
+        //  Car::query()->select('model','car_number','id','odometer')->
+        // $q->havingRaw('DATEDIFF(now(), max(created_at)) >= 4');
+
+        $qu = $query->get();
+        // Log::info($qu->latestOdometerHistory());
+        //  Car::query()->whereHas('user')->whereHas('latestOdometerHistory', function ($q) {
+        //       $q->where('odometer_status','Overdue');
+        //    // $q->havingRaw('DATEDIFF(now(), max(created_at)) >= 4');
+        // });
+        //  $query =
+        //          Car::query()->where('odometer_status','Overdue');
 
         return $this->applyScopes($query)->orderByDesc('created_at');
     }
@@ -103,7 +121,7 @@ class OverdueOdometerEntryDataTable extends DataTable
         return $columns;
     }
 
-    protected function filename():string
+    protected function filename(): string
     {
         return 'OverdueOdometerEntryDataTable_' . date('YmdHis');
     }

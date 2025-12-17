@@ -22,7 +22,10 @@ Route::prefix('driver')->middleware('driverOnly')->group(function () {
         $ongoing_waybills = \App\Models\Waybill::isOngoing()->whereBelongsTo(Auth::user(), 'driver')->count();
         $rejected_waybills = \App\Models\Waybill::isRejected()->whereBelongsTo(Auth::user(), 'driver')->count();
         $completed_waybills = \App\Models\Waybill::isCompleted()->whereBelongsTo(Auth::user(), 'driver')->count();
-        $my_trip =  CarRequest::where('user_id',Auth::user()->id)->count();
+        $my_trip =  CarRequest::where('user_id', Auth::id())
+            ->where('status', 'approved')
+            ->whereIn('trip_status', ['pending', 'started'])
+            ->count();;
 
         return view('drivers.dashboard', [
             'total_car_requests' => $total_car_requests,
@@ -35,7 +38,7 @@ Route::prefix('driver')->middleware('driverOnly')->group(function () {
             'rejected_waybills' => $rejected_waybills,
             'completed_waybills' => $completed_waybills,
             'my_trip' => $my_trip,
-            
+
 
         ]);
     })->name('driver.dashboard');

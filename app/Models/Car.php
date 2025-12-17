@@ -85,7 +85,11 @@ class Car extends Model
     {
         return $this->odometerHistory()->selectRaw('id, user_id, car_id, max(created_at) as created_at, new_value')->groupBy(['user_id', 'car_id'])->orderByRaw('max(created_at)')->first();
     }
-
+    public function latestOdometer()
+    {
+        return $this->hasOne(OdometerHistory::class, 'car_id')
+            ->latestOfMany();
+    }
     public function odometerHistories()
     {
         return $this->hasMany(OdometerHistory::class);

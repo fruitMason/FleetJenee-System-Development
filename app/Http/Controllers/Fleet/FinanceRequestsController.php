@@ -16,10 +16,7 @@ class FinanceRequestsController extends Controller
 {
     public function index(FinanceRequestsDataTable $dataTable)
     {
-        // $users = User::select('first_name', 'middle_name', 'last_name', 'id')->orderBy('first_name')->get();
-        // $cars = Car::select('model', 'car_number', 'year', 'id')->orderBy('model')->get();
-        // $vendors = Vendor::select('name', 'id')->orderBy('name')->get();
-
+ 
 
         return $dataTable->render('main_fleet.finance_requests.index-fin-requests', [
             // 'users' => $users,
